@@ -28,6 +28,10 @@ if($uu->id) {
 } else  
     if ($uri[1])  
         $uu->id = -1; 
+if(!$uri[1])
+	$category = isset($_GET['category']) ? $_GET['category'] : 'projects';
+
+require_once('static/php/function.php');
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -35,59 +39,21 @@ if($uu->id) {
 		<title><? echo $site; ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="/static/css/suisse.css">
 		<link rel="stylesheet" href="/static/css/main.css">
-		<link rel="stylesheet" href="/static/css/sf-text.css">
-		<link rel="stylesheet" href="/static/css/sf-mono.css">
 		<link rel="apple-touch-icon" href="/media/png/touchicon.png" />
+
 	</head>
-	<body><?
-	    if(!$uu->id) {
-    	    ?><header id="menu" class="hidden homepage"><?
-	    }
-	    else if($show_menu) {
-    	    ?><header id="menu" class="visible"><?
-	    }
-	    else {
-    	    ?><header id="menu" class="hidden"><?
-	    }
-	    ?><ul>
-		    <li><?
-			    if($uu->id) {
-				    ?><a href="<? echo $host; ?>"><?= $head; ?></a><?
-			    }
-			    else { 
-                    echo $head; 
-                }
-		    ?></li>
-		    <ul class="nav-level"><?
-	    if(!empty($nav))
-	    {
-	    	$prevd = $nav[0]['depth'];
-		    foreach($nav as $n) {
-			    $d = $n['depth'];
-			    if($d > $prevd) {
-	    		    ?><ul class="nav-level"><?
-			    }
-			    else {
-				    for($i = 0; $i < $prevd - $d; $i++) { 
-	                    ?></ul><? 
-	                }
-			    }
-			    ?><li><?
-				    if($n['o']['id'] != $uu->id) {
-	    			    ?><a href="<? echo $host.$n['url']; ?>"><?
-					    echo $n['o']['name1'];
-	                    if ($n['o']['deck'] && !ctype_space($n['o']['deck']))
-	    				    echo ', ' . $n['o']['deck'];
-		    		    ?></a><?
-				    }
-				    else {
-	    			    ?><span><?= $n['o']['name1']; ?></span><?
-				    }
-			    ?></li><?
-			    $prevd = $d;
-		    }
-	    }
-	    ?></ul>
-	    </ul>
-    </header>
+	<body <?= isset($category) ? 'category="'.$category.'"' : '' ?>>
+	<script src="/static/js/_sniffing.js"></script>
+	<header id= "main-header" class="float-container padding-wrapper">
+		<a id="site-name" href="/"></a>
+		<div id="main-header-btn-container" class="float-container">
+			<a href="/about" class="about-btn in-header middle">ABOUT</a>
+			<div id="cat-toggle-btn-container" class="float-container <?= $uri[1] ? 'inactive' : ''; ?>">
+				<p id="cat-projects" class="cat-name middle">PROJECTS</p>
+				<div id="cat-toggle-btn"></div>
+				<p id="cat-commissions" class="cat-name middle">COMMISSIONS</p>
+			</div>
+		</div>
+	</header>
