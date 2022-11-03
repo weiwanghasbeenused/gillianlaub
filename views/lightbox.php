@@ -232,7 +232,7 @@
 	});
 	
 	window.addEventListener('resize', function(){
-		console.log('resize');
+		console.log('resizeee');
 		console.log(window.innerHeight);
 		slightbox_container.style.height = window.innerHeight + 'px';
 	});
