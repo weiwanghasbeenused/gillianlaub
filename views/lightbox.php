@@ -232,8 +232,8 @@
 	});
 	
 	window.addEventListener('resize', function(){
-		console.log('resizeee');
-		console.log(window.innerHeight);
+		// console.log('resizeee');
+		// console.log(window.innerHeight);
 		slightbox_container.style.height = window.innerHeight + 'px';
 	});
 </script>

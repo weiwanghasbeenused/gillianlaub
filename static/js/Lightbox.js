@@ -14,6 +14,7 @@ class Lightbox{
 		this.loadImg('current');
 		this.loadImg('next');
 		this.loadImg('prev');
+		this.container.style.height = window.innerHeight + 'px';
 		document.body.classList.add('viewing-lightbox');
 	}
 	next(){
