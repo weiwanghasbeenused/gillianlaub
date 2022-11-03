@@ -28,8 +28,12 @@ if($uu->id) {
 } else  
     if ($uri[1])  
         $uu->id = -1; 
-if(!$uri[1])
+
+$body_class = '';
+if(!$uri[1]){
 	$category = isset($_GET['category']) ? $_GET['category'] : 'projects';
+	$body_class .= ' home';
+}
 
 require_once('static/php/function.php');
 
@@ -44,7 +48,7 @@ require_once('static/php/function.php');
 		<link rel="apple-touch-icon" href="/media/png/touchicon.png" />
 
 	</head>
-	<body <?= isset($category) ? 'category="'.$category.'"' : '' ?>>
+	<body class="<?= $body_class; ?>" <?= isset($category) ? 'category="'.$category.'"' : '' ?>>
 	<script src="/static/js/_sniffing.js"></script>
 	<header id= "main-header" class="float-container padding-wrapper">
 		<a id="site-name" href="/"></a>

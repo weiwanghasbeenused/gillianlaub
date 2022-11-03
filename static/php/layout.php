@@ -5,9 +5,11 @@ function renderGrid($items, $colNumber, $id='', $itemType='link'){
 		return render2ColsGrid($items, $id, $itemType);
 	else if($colNumber == 3)
 		return render3ColsGrid($items, $id, $itemType);
+	else if($colNumber == '2-3')
+		return render2to3ColsGrid($items, $id, $itemType);
 }
 function render2ColsGrid($items, $id='', $itemType='link'){
-	$output = '<div id="'.$id.'" class="two-cols-grid-container grid-container padding-wrapper">';
+	$output = '<div id="'.$id.'" class="two-cols-grid-container grid-container">';
 	
 	$common_class = 'two-cols-grid-item';
 	foreach($items as $key => $item){
@@ -21,8 +23,23 @@ function render2ColsGrid($items, $id='', $itemType='link'){
 	$output .= '</div>';
 	return $output;
 }
+function render2to3ColsGrid($items, $id='', $itemType='link'){
+	$output = '<div id="'.$id.'" class="two-to-three-cols-grid-container grid-container">';
+	$common_class = 'two-to-three-cols-grid-item';
+	foreach($items as $key => $item){
+		$class = '';
+		// if( ($key + 1) % 2 == 1)
+		// 	$class = $common_class . ' first-col-grid-item';
+		// else if(($key + 1) % 2 == 0)
+		// 	$class = $common_class . ' second-col-grid-item last-col-grid-item';
+		if( $itemType == 'link' ) $output .= renderLinkItem($item, $class);
+		else if ($itemType == 'gallery') $output .= renderGalleryItem($item, $class);
+	}
+	$output .= '</div>';
+	return $output;
+}
 function render3ColsGrid($items, $id='', $itemType='link'){
-	$output = '<div id="'.$id.'" class="three-cols-grid-container grid-container padding-wrapper">';
+	$output = '<div id="'.$id.'" class="three-cols-grid-container grid-container">';
 	$common_class = 'three-cols-grid-item';
 	foreach($items as $key => $item){
 		if( ($key + 1) % 3 == 1)
@@ -50,7 +67,7 @@ function renderLinkItem($item, $class=''){
 	return $output;
 }
 function renderGalleryItem($item, $class=''){
-	$output = '<div class="grid-item lightbox-btn '.$class.'"><div class="grid-item-thumbnail-container"><img loading="lazy" alt="'.$item['caption'].'" class="grid-item-thumbnail" src="'.m_url($item).'"></div></div>';
+	$output = '<div class="grid-item '.$class.'"><div class="grid-item-thumbnail-container"><img loading="lazy" alt="'.$item['caption'].'" class="grid-item-thumbnail lightbox-btn" src="'.m_url($item).'"></div></div>';
 	return $output;
 }
 

@@ -40,7 +40,7 @@ foreach($commissions as &$c)
 unset($c);
 
 ?>
-<main id="home-container" class="main-container">
+<main id="home-container" class="main-container padding-wrapper">
     <?
     	echo renderGrid($projects, $col_number, 'projects-grid-container');
 		echo renderGrid($commissions, $col_number, 'commissions-grid-container');
