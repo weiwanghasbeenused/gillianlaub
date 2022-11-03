@@ -230,15 +230,8 @@
 	sLightbox_next_button.addEventListener('click', function(){
 		lightbox.next();
 	});
-	// function init(figure){
-	// 	body.classList.add('viewing-lightbox');
-	// 	let this_img = figure.querySelector('IMG');
-	// 	let this_src = this_img.src;
-	// 	let this_caption = this_img.getAttribute('alt');
-	// 	document.querySelector('#lightbox-current-image img').src = this_src;
-	// 	document.querySelector('#lightbox-current-image .lightbox-caption').innerHTML = this_caption;
-	// }
-	// function exit(){
-	// 	body.classList.remove('viewing-lightbox');
-	// }
+	
+	window.addEventListener('resize', function(){
+		slightbox_container.height = window.innerHeight + 'px';
+	});
 </script>
