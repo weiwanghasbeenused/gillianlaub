@@ -201,7 +201,7 @@
 		<div id="lightbox-next-button"></div>
 		<div id="lightbox-prev-button"></div>
 	</div>
-	<div id="lightbox-close-button" onclick="exit()"></div>
+	<div id="lightbox-close-button"></div>
 </div>
 <script src="/static/js/Lightbox.js"></script>
 <script>
@@ -234,6 +234,6 @@
 	window.addEventListener('resize', function(){
 		console.log('resize');
 		console.log(window.innerHeight);
-		slightbox_container.height = window.innerHeight + 'px';
+		slightbox_container.style.height = window.innerHeight + 'px';
 	});
 </script>
