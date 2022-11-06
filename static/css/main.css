@@ -430,7 +430,7 @@ body[category="commissions"] #projects-grid-container
     }
     body[category="commissions"] #cat-toggle-btn:after
     {
-        left: 36px;
+        left: 38px;
     }
 
 }
