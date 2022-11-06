@@ -230,7 +230,7 @@ body[category="commissions"] #cat-toggle-btn:after
 }
 
 body[category="projects"] #commissions-grid-container,
-body[category="commissions"] #home-container
+body[category="commissions"] #projects-grid-container
 {
     display: none;
 }
