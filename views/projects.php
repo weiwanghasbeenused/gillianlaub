@@ -17,6 +17,7 @@ if(count($children) == 1){
 	$pageType = 'detail';
 	$about = $item['deck'];
 	$detail_item = $children[0];
+	$section = false;
 }
 else{
 	$section = isset($_GET['section']) ? $_GET['section'] : false;
@@ -55,17 +56,25 @@ if($pageType == 'detail')
 	$project_description = empty($item['deck']) ? false : $item['deck'];
 }
 
-// $container_class = 'main-container';
+$pattern_projectSite = '/\[project\-site\]\((.*?)\)/';
+preg_match($pattern_projectSite, $item['notes'], $temp);
+
+if(!empty($temp))
+	$project_site_url = $temp[1];
+else
+	$project_site_url = false;
 
 ?>
 <main id="project-container" class="main-container padding-wrapper">
-	<h1 class="project-name in-main large"><?= $item['name1'];?></h1>
+	<h1 class="project-name in-main large"><?= $item['name1']; ?></h1>
     <?
+    	if($project_site_url)
+			echo '<a class="small project-site-link in-main" href="' . $project_site_url . '" target="_blank">PROJECT SITE<span class="top-right-arrow"></span></a>';
     	if($pageType == 'detail')
 		{
 			if($project_description)
 			{
-				?><div id="project-description-container" class="large"><?= $project_description . '<br><br>' . $project_description ; ?></div>
+				?><div id="project-description-container" class="large"><h1 class="project-name large in-description"><?= $item['name1']; ?></h1><?= $project_description . '<br><br>' . $project_description ; ?></div>
 				<?
 			}
 			$media = $oo->media($detail_item['id']);
@@ -81,7 +90,7 @@ if($pageType == 'detail')
 			}
 			else if($current_layout == 'scroll')
 			{
-				?><div id="gallery-container" class="scroll-gallery-container"><? 
+				?><div id="gallery-container" class="scroll-gallery-container large"><? 
 					$body = $detail_item['body'];
 					$img_tag_pattern = '/\<img\ssrc\=\"(.*?)\">/';
 					$media_id_pattern = '/\/media\/(.*?)\./';
@@ -169,6 +178,8 @@ if($pageType == 'detail')
 			echo renderSectionLinks($sections, $section);
 			
 		}
+		if($project_site_url)
+			echo '<a class="project-sections-link small project-site-link in-footer" href="' . $project_site_url . '" target="_blank">PROJECT SITE<span class="top-right-arrow"></span></a>';
 		if($layout_options)
 		{
 			$baseClass = 'icon-btn layout-option-btn';
@@ -274,7 +285,7 @@ if($pageType == 'detail')
     display: inline-block;
     /*overflow: hidden;*/
     border-bottom: 3px solid #000;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
     position: relative;
     float: left;
     text-align: left;
@@ -481,8 +492,8 @@ if($pageType == 'detail')
     left: -10000px;
     top: 0;
     overflow: scroll;
-    padding: 10px 10px 60px 10px;
-    line-height: 1.2em;
+    padding: 20px 10px 60px 10px;
+    line-height: 1.3em;
 }
 .viewing-description #project-description-container
 {
@@ -521,6 +532,61 @@ if($pageType == 'detail')
 {
     display: none;
 }
+.project-name.in-description
+{
+	margin-bottom: 1em;
+}
+.top-right-arrow
+{
+	position: relative;
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-left: 5px;
+	/*top: 2px;*/
+}
+.top-right-arrow:before
+{
+	content: "";
+	position: absolute;
+	border-top: 3px solid;
+	border-right: 3px solid;
+	top: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+	border-color: inherit;
+
+}
+.top-right-arrow:after
+{
+	content: "";
+	border-top: 3px solid;
+	position: absolute;
+	top: 0;
+	right: 1.5px;
+	transform-origin: center right;
+	width: 130%;
+	/*transform: translate(-50%, -50%);*/
+	transform: rotate(-45deg);
+	border-color: inherit;
+}
+.project-site-link.in-main
+{
+	font-weight: 700;
+	margin-bottom: 20px;
+	text-align: center;
+	display: block;
+}
+.project-site-link.in-footer
+{
+	display: none;
+}
+#gallery-container
+{
+	line-height: 1.3em;
+}
 @media screen and (min-width: 376px) {
     .project-sections-select-wrapper
     {
@@ -552,6 +618,16 @@ if($pageType == 'detail')
 		padding-bottom: 70px;
 		padding-left: 10vw;
 		padding-right: 10vw;
+		padding-top: 40px;
+	}
+	.lightbox-image-wrapper
+	{
+		position: relative;
+		flex: 1;
+	}
+	.lightbox-image img
+	{
+		position: absolute;
 	}
 }
 @media screen and (min-width: 769px) {
@@ -606,6 +682,10 @@ if($pageType == 'detail')
         float: left;
         margin-top: 7px;
     }
+    .project-name.in-description
+    {
+    	display: none;
+    }
     #project-sections-toucharea
 	{
 		display: none;
@@ -617,6 +697,19 @@ if($pageType == 'detail')
 	.project-sections-link-container.not-dropdown
 	{
 		display: inline-block;
+	}
+	.project-site-link.in-main
+	{
+		display: none;
+	}
+	.project-site-link.in-footer
+	{
+		display: inline-block;
+	}
+	.noTouchScreen .top-right-arrow:after,
+	.noTouchScreen .top-right-arrow:before
+	{
+		border-color: ;
 	}
 }
 @media screen and (min-width: 1024px) {

@@ -23,7 +23,7 @@ else
 $col_number = 3; 
 
 $temp = $oo->urls_to_ids(array('projects'));
-$projects = $oo->children(end($temp));
+$projects = removeHiddenChildren($oo->children(end($temp)));
 foreach($projects as &$p)
 {
 	$fullUrl = '/projects/' . $p['url'];
@@ -31,7 +31,7 @@ foreach($projects as &$p)
 }
 unset($p);
 $temp = $oo->urls_to_ids(array('commissions'));
-$commissions = $oo->children(end($temp));
+$commissions = removeHiddenChildren($oo->children(end($temp)));
 foreach($commissions as &$c)
 {
 	$fullUrl = '/commissions/' . $c['url'];

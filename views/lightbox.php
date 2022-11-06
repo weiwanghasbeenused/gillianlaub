@@ -12,7 +12,7 @@
 		opacity: 0;
 		display: flex;
 		flex-direction: column;
-		padding: 10px 0 20px 0;
+		padding: 20px 10px;
 
 	}
 	body.viewing-lightbox #lightbox-container
@@ -30,7 +30,7 @@
 
 	.project-name.in-lightbox
 	{
-		text-align: center;
+		padding-right: 30px;
 		padding-bottom: 10px;
 	}
 
@@ -45,34 +45,32 @@
 		/*flex-basis: auto;*/
 		/*flex-grow: 1;*/
 		flex: 1;
-		
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 	}
 	.lightbox-image-wrapper
 	{
-		flex: 1;
-		position: relative;
+		/*flex: 1;*/
+		/*position: relative;*/
 	}
 	.lightbox-image img
 	{
-		/*height: 100%;*/
 		display: block;
 		object-fit: contain;
-		/*flex: 1;*/
-		position: absolute;
+		/*position: absolute;*/
 		width: 100%;
 		height: 100%;
 	}
 	#lightbox-control-container
 	{
 		position: relative;
-		padding: 0 10px;
+		padding: 0 2px;
 	}
 	#lightbox-close-button
 	{
 		position: absolute;
-		top: 10px;
+		top: 17px;
 		right: 8px;
 		width: 27px;
 		height: 27px;
@@ -157,8 +155,35 @@
 	.lightbox-caption
 	{
 		text-align: center;
-		padding: 20px 0;
+		padding: 10px 0;
 	}
+	@media screen and (min-width: 376px){
+		#lightbox-container
+		{
+			padding-top: 40px;
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		#lightbox-close-button
+		{
+			top: 37px;
+		}
+		.project-name.in-lightbox
+		{
+			padding-right: 20px;
+			padding-bottom: 40px;
+		}
+	}
+	@media screen and (min-width: 769px){
+		.project-name.in-lightbox
+		{
+			/*padding-bottom: 40px;*/
+			padding-right: 0px;
+			text-align: center;
+		}
+	}
+
+	
 	@media screen and (min-width: 821px){
 		.lightbox-caption
 		{
@@ -172,6 +197,12 @@
 		{
 			padding-left: 15%;
 			padding-right: 15%;
+		}
+		#lightbox-next-button,
+		#lightbox-prev-button
+		{
+			width: 36px;
+			height: 36px;
 		}
 	}
 </style>
