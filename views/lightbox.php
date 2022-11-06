@@ -167,6 +167,7 @@
 		#lightbox-close-button
 		{
 			top: 37px;
+			right: 16px;
 		}
 		.project-name.in-lightbox
 		{
@@ -199,7 +200,8 @@
 			padding-right: 15%;
 		}
 		#lightbox-next-button,
-		#lightbox-prev-button
+		#lightbox-prev-button,
+		#lightbox-close-button
 		{
 			width: 36px;
 			height: 36px;

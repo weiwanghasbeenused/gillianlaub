@@ -256,6 +256,11 @@ body[category="commissions"] #home-container
 {
     font-weight: 600;
     font-size: 14px;
+    line-height: 1.4em;
+}
+.gallery-caption
+{
+    margin-top: 10px;
 }
 .footer
 {
@@ -331,19 +336,7 @@ body[category="commissions"] #home-container
     
     
 }
-@media screen and (min-width: 769px) {
-    .padding-wrapper
-    {
-        padding-left: 25px;
-        padding-right:  25px;
-    }
-    #site-name
-    {
-        font-size: 38px;
-        line-height: 38px;
-        text-align: left;
-    }
-    /* grid layout */
+@media screen and (min-width: 700px) {
     .grid-item{
         display: inline-block;
         margin-right: 25px;
@@ -386,6 +379,22 @@ body[category="commissions"] #home-container
     {
          margin-bottom: 25px;
     }
+} 
+@media screen and (min-width: 769px) {
+    .padding-wrapper
+    {
+        padding-left: 25px;
+        padding-right:  25px;
+    }
+    #site-name
+    {
+        font-size: 38px;
+        line-height: 38px;
+        text-align: left;
+    }
+    /* grid layout */
+
+    
     
     #gallery-container.scroll-gallery-container
     {
