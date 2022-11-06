@@ -74,7 +74,7 @@ else
 		{
 			if($project_description)
 			{
-				?><div id="project-description-container" class="large"><h1 class="project-name large in-description"><?= $item['name1']; ?></h1><?= $project_description . '<br><br>' . $project_description ; ?></div>
+				?><div id="project-description-container" class="large"><h1 class="project-name large in-description"><?= $item['name1']; ?></h1><?= $project_description ; ?></div>
 				<?
 			}
 			$media = $oo->media($detail_item['id']);
