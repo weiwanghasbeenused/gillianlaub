@@ -94,7 +94,6 @@ else
 					$body = $detail_item['body'];
 					$img_tag_pattern = '/\<img\ssrc\=\"(.*?)\">/';
 					$media_id_pattern = '/\/media\/(.*?)\./';
-
 					preg_match_all($img_tag_pattern, $body, $temp);
 					if(!empty($temp) && !empty($temp[1]))
 					{
@@ -207,7 +206,6 @@ else
 				{
 					?><a href = '<?= $baseUrl . $option; ?>' class="<?= $class; ?>"></a><?
 				}
-				
 			}
 		}
 		if($project_description)
