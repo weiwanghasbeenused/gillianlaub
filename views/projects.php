@@ -618,15 +618,7 @@ else
 		padding-right: 10vw;
 		padding-top: 40px;
 	}
-	.lightbox-image-wrapper
-	{
-		position: relative;
-		flex: 1;
-	}
-	.lightbox-image img
-	{
-		position: absolute;
-	}
+	
 }
 @media screen and (min-width: 769px) {
 	.viewing-dropdown #project-sections-toucharea

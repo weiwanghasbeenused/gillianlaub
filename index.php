@@ -8,8 +8,8 @@ if (!$uri[1])
     require_once("views/home.php");
 else if($uri[1] == 'projects')
     require_once("views/projects.php");
-else if ($uri[1] == 'read')
-    require_once("views/read.php");
+else if ($uri[1] == 'about')
+    require_once("views/about.php");
 else 
     require_once("views/main.php");
 // require_once("views/badge.php");

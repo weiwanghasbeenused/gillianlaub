@@ -41,9 +41,6 @@
 	}
 	.lightbox-image
 	{
-		/*height: 100%;*/
-		/*flex-basis: auto;*/
-		/*flex-grow: 1;*/
 		flex: 1;
 		display: flex;
 		flex-direction: column;
@@ -171,8 +168,17 @@
 		}
 		.project-name.in-lightbox
 		{
-			padding-right: 20px;
+			padding-right: 30px;
 			padding-bottom: 40px;
+		}
+		.lightbox-image-wrapper
+		{
+			position: relative;
+			flex: 1;
+		}
+		.lightbox-image img
+		{
+			position: absolute;
 		}
 	}
 	@media screen and (min-width: 769px){
