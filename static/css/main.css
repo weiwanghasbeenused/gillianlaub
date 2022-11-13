@@ -267,7 +267,7 @@ body[category="commissions"] #projects-grid-container
 }
 .gallery-caption
 {
-    margin-top: 10px;
+    margin-top: 5px;
 }
 .footer
 {
@@ -288,6 +288,38 @@ body[category="commissions"] #projects-grid-container
 .lightbox-btn
 {
     cursor: pointer;
+}
+.gallery-image
+{
+    display: block;
+}
+.cross-icon
+{
+    position: absolute;
+    top: 17px;
+    right: 8px;
+    width: 27px;
+    height: 27px;
+    cursor: pointer;
+}
+.cross-icon:before,
+.cross-icon:after
+{
+    content: "";
+    position: absolute;
+    border-top: 3px solid #000;
+    width: 120%;
+    top: 50%;
+    left: 50%;
+    
+}
+.cross-icon:before
+{
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.cross-icon:after
+{
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 @media screen and (min-width: 321px) {
     .middle
@@ -340,7 +372,11 @@ body[category="commissions"] #projects-grid-container
     {
         padding-top: 160px;
     }
-    
+    .cross-icon
+    {
+        top: 37px;
+        right: 16px;
+    }
     
 }
 @media screen and (min-width: 700px) {
@@ -386,6 +422,10 @@ body[category="commissions"] #projects-grid-container
     {
          margin-bottom: 25px;
     }
+    .gallery-caption
+    {
+        margin-top: 10px;
+    }
 } 
 @media screen and (min-width: 769px) {
     .padding-wrapper
@@ -417,8 +457,8 @@ body[category="commissions"] #projects-grid-container
     }
     .gallery-caption
     {
-        font-size: 18px;
-        margin-top: 14px;
+/*        font-size: 18px;*/
+/*        margin-top: 14px;*/
     }
     #cat-toggle-btn
     {
@@ -476,26 +516,29 @@ body[category="commissions"] #projects-grid-container
     {
         padding-top: 76px;
     }
+    #project-container
+    {
+        padding-top: 96px;
+    }
     #cat-toggle-btn-container.inactive 
     {
         display: inline-flex;
         color: #BBB;
     }
-    
     .project-name.in-main
     {
         display: none;
     }
-    #project-container
-    {
-        padding-top: 76px;
-    }
+    
 }
 @media screen and (min-width: 1024px) {
-    #home-container,
+    #home-container
+    {
+        padding-top: 86px;
+    }
     #project-container
     {
-        padding-top: 103px;
+        padding-top: 106px;
     }
 
     #site-name
@@ -537,11 +580,23 @@ body[category="commissions"] #projects-grid-container
     {
         margin-right: 20px;
     }
-
+    .cross-icon
+    {
+        width: 36px;
+        height: 36px;
+    }
     
 }
 
 @media screen and (min-width: 1200px) {
+    #home-container
+    {
+        padding-top: 90px;
+    }
+    #project-container
+    {
+        padding-top:110px;
+    }
     #main-header-btn-container
     {
         margin-top: 2px;

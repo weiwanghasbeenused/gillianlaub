@@ -74,7 +74,7 @@ else
 		{
 			if($project_description)
 			{
-				?><div id="project-description-container" class="large"><h1 class="project-name large in-description"><?= $item['name1']; ?></h1><?= $project_description ; ?></div>
+				?><div id="project-description-container" class="large"><h1 class="project-name large in-description"><?= $item['name1']; ?></h1><div id="description-close-button" class="cross-icon"></div><?= $project_description ; ?></div>
 				<?
 			}
 			$media = $oo->media($detail_item['id']);
@@ -215,7 +215,6 @@ else
 				<div class="description-btn-bar"></div>
 				<div class="description-btn-bar"></div>
 			</div>
-			<!-- <div id="close-project-description-btn" class="icon-btn"></div> -->
 			<?
 		}
 	}
@@ -228,21 +227,22 @@ else
     	sDescription_btn.addEventListener('click', function(){
     		body.classList.toggle('viewing-description');
     	});
-    		
     }
-    var sClose_project_description_btn = document.getElementById('close-project-description-btn');
-    console.log(sClose_project_description_btn);
-    if(sClose_project_description_btn){
-    	sClose_project_description_btn.addEventListener('click', function(){
-    		// console.log('click');
+    var sDescription_close_button = document.getElementById('description-close-button');
+    if(sDescription_close_button){
+    	sDescription_close_button.addEventListener('click', function(){
     		body.classList.remove('viewing-description');
     	});
-    	// sClose_project_description_btn.onClick = function(){ body.classList.remove('viewing-description'); };
+    }
+    var sClose_project_description_btn = document.getElementById('close-project-description-btn');
+    if(sClose_project_description_btn){
+    	sClose_project_description_btn.addEventListener('click', function(){
+    		body.classList.remove('viewing-description');
+    	});
     }
     if(window.innerWidth < 821)
     {
     	var sProject_sections_toucharea = document.getElementById('project-sections-toucharea');
-    	// var sProject_sections_dummy = document.querySelector('.project-sections-dummy');
     	if(sProject_sections_toucharea)
     	{
     		sProject_sections_toucharea.addEventListener('click', function(){
@@ -251,7 +251,7 @@ else
     	}
     	
     }
-    
+
 </script>
 <? require_once('views/lightbox.php'); ?>
 <style>
@@ -307,7 +307,7 @@ else
     content: "";
     display: block;
     position: absolute;
-    right: 5px;
+    right: 4px;
     top: 4px;
     width: 0px;
     height: 0px;
@@ -344,7 +344,7 @@ else
     margin-right: 10px;
     font-weight: 600;
     display: block;
-    padding:5px;
+    padding:5px 0;
 }
 .icon-btn
 {
@@ -433,27 +433,6 @@ else
 {
     top: 19.5px;
 }
-.viewing-description .description-btn-bar
-{
-    opacity: 0;
-}
-.viewing-description #description-btn:before,
-.viewing-description #description-btn:after
-{
-    border-color: #000;
-    left: 50%;
-    width: 120%;
-}
-.viewing-description #description-btn:before
-{
-    top: 50%;
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-.viewing-description #description-btn:after
-{
-    bottom: 50%;
-    transform: translate(-50%, 50%) rotate(-45deg);
-}
 .icon-btn.active
 {
     border-color: #000;
@@ -509,6 +488,10 @@ else
 {
     opacity: 0;
     pointer-events: none;
+}
+.viewing-description #project-footer
+{
+	display: none;
 }
 .align-right
 {
@@ -603,9 +586,10 @@ else
     {
         padding: 20px;
     }
-    .project-sections-dummy, .project-sections-link
+    .project-sections-dummy,
+    .project-sections-link
     {
-        padding: 8px;
+        padding: 8px 0;
     }
     #project-footer
     {
@@ -629,10 +613,13 @@ else
 	}
 	#project-description-container
 	{
-		/*padding-left: 5vw;*/
 		padding-left: 10vw;
 		padding-right: 10vw;
 	}
+	.project-name.in-description
+    {
+    	text-align: center;
+    }
 
 }
 @media screen and (min-width: 821px) {
@@ -675,11 +662,6 @@ else
     .project-name.in-footer
     {
         display: block;
-/*        padding-top: 2px;*/
-    }
-    .project-name.in-description
-    {
-    	display: none;
     }
     #project-sections-toucharea
 	{
@@ -693,7 +675,6 @@ else
 	{
 		display: block;
 		vertical-align: top;
-/*		margin-top: 2.5px;*/
 	}
 	.project-site-link.in-main
 	{
@@ -740,6 +721,11 @@ else
 		padding-right: 15vw;
 		padding-left: 15vw;
 		padding-bottom: 80px;
+	}
+	#project-description-container
+	{
+		padding-left: 20vw;
+		padding-right: 20vw;
 	}
 }
 @media screen and (min-width: 1200px) {

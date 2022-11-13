@@ -64,34 +64,6 @@
 		position: relative;
 		padding: 0 2px;
 	}
-	#lightbox-close-button
-	{
-		position: absolute;
-		top: 17px;
-		right: 8px;
-		width: 27px;
-		height: 27px;
-		cursor: pointer;
-	}
-	#lightbox-close-button:before,
-	#lightbox-close-button:after
-	{
-		content: "";
-		position: absolute;
-		border-top: 3px solid #000;
-		width: 100%;
-		top: 50%;
-		left: 50%;
-		
-	}
-	#lightbox-close-button:before
-	{
-		transform: translate(-50%, -50%) rotate(45deg);
-	}
-	#lightbox-close-button:after
-	{
-		transform: translate(-50%, -50%) rotate(-45deg);
-	}
 	#lightbox-next-button,
 	#lightbox-prev-button
 	{
@@ -161,11 +133,6 @@
 			padding-left: 20px;
 			padding-right: 20px;
 		}
-		#lightbox-close-button
-		{
-			top: 37px;
-			right: 16px;
-		}
 		.project-name.in-lightbox
 		{
 			padding-right: 30px;
@@ -184,8 +151,8 @@
 	@media screen and (min-width: 769px){
 		.project-name.in-lightbox
 		{
-			/*padding-bottom: 40px;*/
-			padding-right: 0px;
+			padding-right: 10vw;
+			padding-left: 10vw;
 			text-align: center;
 		}
 	}
@@ -206,8 +173,7 @@
 			padding-right: 15%;
 		}
 		#lightbox-next-button,
-		#lightbox-prev-button,
-		#lightbox-close-button
+		#lightbox-prev-button
 		{
 			width: 36px;
 			height: 36px;
@@ -240,7 +206,7 @@
 		<div id="lightbox-next-button"></div>
 		<div id="lightbox-prev-button"></div>
 	</div>
-	<div id="lightbox-close-button"></div>
+	<div id="lightbox-close-button" class="cross-icon"></div>
 </div>
 <script src="/static/js/Lightbox.js"></script>
 <script>

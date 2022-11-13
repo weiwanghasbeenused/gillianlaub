@@ -49,6 +49,11 @@ require_once('static/php/function.php');
 
 	</head>
 	<body class="<?= $body_class; ?>" <?= isset($category) ? 'category="'.$category.'"' : '' ?>>
+	<script>
+		var wW = window.innerWidth;
+		var wH = window.innerHeight;
+		var body = document.body;
+	</script>
 	<script src="/static/js/_sniffing.js"></script>
 	<header id= "main-header" class="float-container padding-wrapper">
 		<a id="site-name" href="/"><img src = "/media/svg/title.svg"></a>
