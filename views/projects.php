@@ -130,7 +130,7 @@ else
     
 </main>
 <footer id="project-footer" class="padding-wrapper float-container">
-	<h1 class="project-name in-footer large"><?= $item['name1'];?></h1>
+	<a class="project-name in-footer large" href="<?= $requestclean; ?>"><?= $item['name1'];?></a>
 	<div class="align-right">
 	<? if($pageType == 'detail'){
 		if($section)
@@ -278,7 +278,7 @@ else
 }
 .project-sections-link-container
 {
-    width: 140px;
+    width: 165px;
     height: 26px;
     display: inline-block;
     /*overflow: hidden;*/
@@ -525,6 +525,7 @@ else
     padding-top: 15px;
     background-color: #fff;
     z-index: 1002;
+    letter-spacing: 0.03em;
 }
 .project-name.in-footer
 {
@@ -657,10 +658,13 @@ else
     {
         display: inline-block;
         padding: 0;
+        margin-right: 15px;
     }
     .align-right
     {
-        flex-grow: 1;
+        flex: 1;
+        display: flex;
+        justify-content: end;
     }
     #project-footer
     {
@@ -669,8 +673,7 @@ else
     .project-name.in-footer
     {
         display: block;
-        float: left;
-        margin-top: 7px;
+        padding-top: 2px;
     }
     .project-name.in-description
     {
@@ -686,7 +689,9 @@ else
 	}
 	.project-sections-link-container.not-dropdown
 	{
-		display: inline-block;
+		display: block;
+		vertical-align: top;
+		margin-top: 2.5px;
 	}
 	.project-site-link.in-main
 	{
@@ -694,7 +699,11 @@ else
 	}
 	.project-site-link.in-footer
 	{
-		display: inline-block;
+		display: block;
+	}
+	.icon-btn
+	{
+		display: block;
 	}
 	.noTouchScreen .top-right-arrow:after,
 	.noTouchScreen .top-right-arrow:before
@@ -714,7 +723,7 @@ else
     }
     .project-name.in-footer
     {
-        margin-top: 0px;
+        padding-top: 3px;
     }
     .description-btn-bar:first-child
     {
@@ -730,6 +739,15 @@ else
 		padding-left: 15vw;
 		padding-bottom: 80px;
 	}
+	.project-sections-link-container.not-dropdown
+	{
+		margin-top: 7px;
+	}
 }
-
+@media screen and (min-width: 1200px) {
+	.project-name.in-footer
+    {
+        padding-top: 0px;
+    }
+}
 </style>

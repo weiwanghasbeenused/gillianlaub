@@ -51,7 +51,7 @@ require_once('static/php/function.php');
 	<body class="<?= $body_class; ?>" <?= isset($category) ? 'category="'.$category.'"' : '' ?>>
 	<script src="/static/js/_sniffing.js"></script>
 	<header id= "main-header" class="float-container padding-wrapper">
-		<a id="site-name" href="/"></a>
+		<a id="site-name" href="/"><img src = "/media/svg/title.svg"></a>
 		<div id="main-header-btn-container" class="float-container">
 			<a href="/about" class="about-btn in-header middle">ABOUT</a>
 			<div id="cat-toggle-btn-container" class="float-container <?= $uri[1] ? 'inactive' : ''; ?>">
