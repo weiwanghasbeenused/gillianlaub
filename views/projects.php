@@ -49,7 +49,7 @@ if($pageType == 'detail')
 	else if($layout_options)
 		$current_layout = $layout_options[0];
 	else
-		$current_layout = 'grid';	
+		$current_layout = 'scroll';	
 	
 	if($current_layout == 'grid')
 		$col_number = '2-3';
@@ -648,6 +648,7 @@ else
         position: static;
         overflow: visible;
         max-height: none;
+        display: flex;
     }
     .project-sections-select-wrapper:after
     {
@@ -656,7 +657,7 @@ else
     .project-sections-dummy,
     .project-sections-link
     {
-        display: inline-block;
+/*        display: inline-block;*/
         padding: 0;
         margin-right: 15px;
     }
@@ -665,6 +666,7 @@ else
         flex: 1;
         display: flex;
         justify-content: end;
+        align-items: center;
     }
     #project-footer
     {
@@ -673,7 +675,7 @@ else
     .project-name.in-footer
     {
         display: block;
-        padding-top: 2px;
+/*        padding-top: 2px;*/
     }
     .project-name.in-description
     {
@@ -691,7 +693,7 @@ else
 	{
 		display: block;
 		vertical-align: top;
-		margin-top: 2.5px;
+/*		margin-top: 2.5px;*/
 	}
 	.project-site-link.in-main
 	{
@@ -738,10 +740,6 @@ else
 		padding-right: 15vw;
 		padding-left: 15vw;
 		padding-bottom: 80px;
-	}
-	.project-sections-link-container.not-dropdown
-	{
-		margin-top: 7px;
 	}
 }
 @media screen and (min-width: 1200px) {
