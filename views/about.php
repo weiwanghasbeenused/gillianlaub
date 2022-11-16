@@ -2,36 +2,49 @@
 include_once('static/php/layout.php');
 $children = $oo->children($item['id']);
 $slideshow_html = '<section id="slideshow-container" class="about-section"><div id="slides-container">';
-$downloads_html = '<section id="downloads-container" class="about-section padding-wrapper">';
-$bio_html = '<section id="bio-container" class="about-section padding-wrapper"><h3 class="large about-section-title">About</h3><p class="middle">';
+$bio_html = '<section id="bio-container" class="about-section padding-wrapper"><h3 class="large about-section-title">About</h3><div class="flex-container" breakpoint="700"><div id="bio-container" class="middle flex-item">';
 $news_and_events_html = '<section id="news-and-events-container" class="about-section padding-wrapper"><h3 class="large about-section-title">News & Events</h3><ul>';
 $contact_and_commissions_html = '<section id="contact-and-commissions-container" class="about-section padding-wrapper"><h3 class="large about-section-title">Contact & Commissions</h3>';
 $books_html = '<section id="books-container" class="about-section padding-wrapper"><h3 class="large about-section-title">Books</h3>';
-$exhibitions_html = '<section id="books-container" class="about-section padding-wrapper"><h3 class="large about-section-title">Exhibitions</h3>';
+$exhibitions_html = '<section id="exhibitions-container" class="about-section padding-wrapper"><h3 class="large about-section-title">Exhibitions</h3>';
+
+$slideshow_srcs = array();
 foreach($children as $child)
 {
 	if($child['url'] == 'slideshow')
 	{
 		$media = $oo->media($child['id']);
-		foreach($media as $m)
-		{
-			$slideshow_html .= '<figure class="slide-container"><img alt="'.$m['caption'].'" class="slide" src="'. m_url($m) .'"><figcaption class="slide-caption caption">'.$m['caption'].'</figcaption></figure>';
-		}
-		$slideshow_html .= '</div></section>';
+		$slideshow_html .= '<div order="-3" class="slide-container"><img alt="'.$media[count($media) - 3]['caption'].'" class="slide" src="'. m_url($media[count($media) - 3]) .'"></div>';
+		$slideshow_html .= '<div order="-2" class="slide-container"><img alt="'.$media[count($media) - 2]['caption'].'" class="slide" src="'. m_url($media[count($media) - 2]) .'"></div>';
+		$slideshow_html .= '<div order="-1" class="slide-container left"><img alt="'.end($media)['caption'].'" class="slide" src="'. m_url(end($media)) .'"></div>';
+		$slideshow_html .= '<div order="0" class="slide-container"><img alt="'.$media[0]['caption'].'" class="slide" src="'. m_url($media[0]) .'"></div>';
+		$slideshow_html .= '<div order="1" class="slide-container right"><img alt="'.$media[1]['caption'].'" class="slide" src="'. m_url($media[1]) .'"></div>';
+		$slideshow_html .= '<div order="2" class="slide-container right"><img alt="'.$media[2]['caption'].'" class="slide" src="'. m_url($media[2]) .'"></div>';
+		$slideshow_html .= '<div order="3" class="slide-container right"><img alt="'.$media[3]['caption'].'" class="slide" src="'. m_url($media[3]) .'"></div>';
+		
+		$slideshow_html .= '</div><p id="slideshow-caption-container" class="caption">'.$media[0]['caption'].'</p><div id="slide-control" class="float-container"><div id="slideshow-prev-button" class="left-arrow-icon"></div><div id="slideshow-next-button" class="right-arrow-icon"></div></div>';
 
-	}
-	else if($child['url'] == 'downloads')
-	{
-		$media = $oo->media($child['id']);
 		foreach($media as $m)
 		{
-			$downloads_html .= '<a class="about-download-btn large" download href="'.m_url($m).'">' . $m['caption'] . '<span class="download-icon"></span></a>';
+			$slideshow_srcs[] = array(
+				'src' => m_url($m),
+				'caption' => $m['caption']
+			);
 		}
-		$downloads_html .= '</section>';
+		
+		$slideshow_html .= '</section>';
+
 	}
 	else if($child['url'] == 'bio')
 	{
-		$bio_html .= $child['deck'] . '</p><div class="more-button">MORE</div></section>';
+		$bio_html .= $child['deck'] . '<div class="more-button"><div class="plus-icon"></div>MORE</div></div><div id="downloads-container" class="flex-item">';
+
+		$media = $oo->media($child['id']);
+		foreach($media as $m)
+		{
+			$bio_html .= '<a class="about-download-btn large" download href="'.m_url($m).'">' . $m['caption'] . '<span class="download-icon"></span></a>';
+		}
+		$bio_html .= '</div></div></section>';
 	}
 	else if($child['url'] == 'news-events')
 	{
@@ -56,14 +69,14 @@ foreach($children as $child)
 		{
 			$date = date('M d', strtotime($e['begin']));
 			$time = date('h:m A', strtotime($e['begin']));
-			$news_and_events_html .= '<li class="event-info"><div class="event-datetime"><span class="event-date">'.$date . '</span><span class=""event-time>' . $time .'</span></div><div class="event-name-location"><p class="middle event-name">'.$e['name1'].'</p><div class="small event-location">'.$e['notes'].'</div></div></li>';
+			$news_and_events_html .= '<li class="event-info flex-container" breakpoint="1024"><div class="event-datetime flex-item"><span class="event-date">'.$date . '</span><span class=""event-time>' . $time .'</span></div><div class="event-name-location flex-item"><p class="middle event-name">'.$e['name1'].'</p><div class="small event-location">'.$e['notes'].'</div></div></li>';
 		}
 		
-		$news_and_events_html .= '</ul><div class="more-button">MORE & PAST EVENTS</div></section>';
+		$news_and_events_html .= '</ul><div class="more-button"><div class="plus-icon"></div>MORE & PAST EVENTS</div></section>';
 	}
 	else if($child['url'] == 'contact-commissions')
 	{
-		$contact_and_commissions_html .= '<div id="contact-container" class="small"><div class="">CONTACT</div>' . $child['deck'] . '</div><div id="commissions-container" class="small"><div >COMMISSIONS</div>' . $child['body'] . '</div></section>';
+		$contact_and_commissions_html .= '<div class="flex-container" breakpoint="1024"><div id="contact-container" class="small flex-item"><div class="">CONTACT</div>' . $child['deck'] . '</div><div id="commissions-container" class="small flex-item"><div >COMMISSIONS</div>' . $child['body'] . '</div></div></section>';
 	}
 	else if($child['url'] == 'books')
 	{
@@ -114,7 +127,6 @@ foreach($children as $child)
 <main id="about-container" class="main-container padding-wrapper">
 	<?= $slideshow_html; ?>
 	<?= $bio_html; ?>
-	<?= $downloads_html; ?>
 	<?= $news_and_events_html; ?>
 	<?= $contact_and_commissions_html; ?>
 	<?= $books_html; ?>
@@ -132,7 +144,6 @@ foreach($children as $child)
 	.about-section
 	{
 		margin-bottom: 75px;
-		line-height: 1.3em;
 	}
 	.about-section-title
 	{
@@ -143,13 +154,11 @@ foreach($children as $child)
 		padding-top: 60px;
 		padding-left: 0;
 		padding-right: 0;
+		padding-bottom:1px;
 	}
-	#slideshow-container
+	#bio-container
 	{
-		overflow: scroll;
-		width: 100%;
-		padding-bottom: 15px;
-		text-align: center;
+		line-height:1.3em;
 	}
 	.padding-wrapper
 	{
@@ -157,42 +166,102 @@ foreach($children as $child)
 	}
 	.slide
 	{
-		height: 30vh;
-		width: auto;
-		/*object-fit: contain;*/
+		height: 40vh;
+		object-fit: contain;
 	}
 	#slides-container
 	{
-		white-space: nowrap;
+		overflow: hidden;
+		position:relative;
+		width:100vw;
+		height: 40vh;
+		padding-bottom: 40px;
+		box-sizing: content-box;
 	}
 	.slide-container
 	{
+		width: 60vw;
 		display: inline-block;
 		padding: 0 10px;
+		position: absolute;
+		left: 0;
+		top: 0;
+
 	}
+	.slide-container[order="-3"]
+	{
+		left: -130vw;
+		transform: translate(-50%, 0);
+	}
+	.slide-container[order="-2"]
+	{
+		left: -70vw;
+		transform: translate(-50%, 0);
+		transition: left .25s;
+	}
+	.slide-container[order="-1"]
+	{
+		left: -10vw;
+		transform: translate(-50%, 0);
+		transition: left .25s;
+	}
+
+	.slide-container[order="0"]
+	{
+		left: 50vw;
+		transform: translate(-50%, 0);
+		transition: left .25s;
+	}
+	.slide-container[order="1"]
+	{
+		left: 110vw;
+		transform: translate(-50%, 0);
+		transition: left .25s;
+	}
+	.slide-container[order="2"]
+	{
+		left: 170vw;
+		transform: translate(-50%, 0);
+		transition: left .25s;
+	}
+	.slide-container[order="3"]
+	{
+		left: 230vw;
+		transform: translate(-50%, 0);
+	}
+	
 	.more-button{
 		font-size: 16px;
     	line-height: 16px;
     	margin-top: 1em;
-    	position: relative;
-    	padding-left: 18px;
+    	
+/*    	padding-left: 18px;*/
 	}
-	.more-button:before
+	.plus-icon
+	{
+		display: inline-block;
+		margin-right: 8px;
+		position: relative;
+		width: 12px;
+		height: 12px;
+		vertical-align: top;
+	}
+	.plus-icon:before
 	{
 		content: "";
 		position: absolute;
-		width: 12px;
+		width: 100%;
 		height: 3px;
 		background-color: #000;
 		left: 0;
 		top: 7px;
 		transform: translate(0, -50%);
 	}
-	.more-button:after
+	.plus-icon:after
 	{
 		content: "";
 		position: absolute;
-		height: 12px;
+		height: 100%;
 		width: 3px;
 		background-color: #000;
 		left: 6px;
@@ -202,7 +271,8 @@ foreach($children as $child)
 	}
 	#downloads-container
 	{
-		margin-top: -50px;
+/*		margin-top: -50px;*/
+		margin-top: 30px;
 	}
 	.about-download-btn{
 		display: inline-block;
@@ -271,10 +341,224 @@ foreach($children as $child)
 	#contact-container,
 	#commissions-container
 	{
-		line-height: 1.2em;
+		line-height: 1.35em;
 	}
 	#contact-container
 	{
 		margin-bottom: 1em;
 	}
+	#slide-control
+	{
+		padding:20px;
+	}
+	#slideshow-caption-container
+	{
+		text-align: center;
+		padding: 0px 20px;
+		min-height:20px;
+	}
+	@media screen and (min-width: 376px)
+	{
+		#about-container
+		{
+			padding-top: 70px;
+		}
+	}
+	
+	@media screen and (min-width: 700px) {
+		.flex-container[breakpoint="700"]
+		{
+			display: flex;
+		}
+		.flex-container[breakpoint="700"] > .flex-item
+		{
+			margin-left: 30px;
+		}
+		.flex-container[breakpoint="700"] > .flex-item:first-child
+		{
+			margin-left: 0;
+		}
+		.event-datetime
+		{
+			flex: 0 0 75px;
+		}
+		.event-date
+		{
+			display: block;
+			width: auto;
+		}
+		.more-button
+		{
+			margin-top: 30px;
+		}
+		#downloads-container
+		{
+			margin-top: 0;
+			flex: 0 0 120px;
+		}
+		#news-and-events-container,
+		#contact-and-commissions-container
+		{
+			display: inline-block;
+			width: 49.5%;
+			vertical-align: top;
+		}
+		.more-button
+		{
+			font-size: 20px;
+			line-heihgt: 20px;
+		}
+		.plus-icon
+		{
+			width: 16px;
+			height:16px;
+		}
+		.plus-icon:before
+		{
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 3px;
+			background-color: #000;
+			left: 0;
+			top: 7px;
+			transform: translate(0, -50%);
+		}
+		.plus-icon:after
+		{
+			content: "";
+			position: absolute;
+			height: 100%;
+			width: 3px;
+			background-color: #000;
+			left: 8px;
+			top: -1px;
+			transform: translate(-50%, 0);
+		}
+	}
+	@media screen and (min-width: 700px) and (orientation: landscape)
+	{
+		.slide-container
+		{
+			width: 40vw;
+		}
+		.slide-container[order="-3"]
+		{
+			left: -70vw;
+			transform: translate(-50%, 0);
+		}
+		.slide-container[order="-2"]
+		{
+			left: -30vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="-1"]
+		{
+			left: 10vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+
+		.slide-container[order="0"]
+		{
+			left: 50vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="1"]
+		{
+			left: 90vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="2"]
+		{
+			left: 130vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="3"]
+		{
+			left: 170vw;
+			transform: translate(-50%, 0);
+		}
+	}
+	@media screen and (min-width: 821px) {
+		.flex-container[breakpoint="821"]
+		{
+			display: flex;
+		}
+		.flex-container[breakpoint="821"] > .flex-item
+		{
+			margin-left: 30px;
+		}
+		.flex-container[breakpoint="821"] > .flex-item:first-child
+		{
+			margin-left: 0;
+		}
+		#slideshow-caption-container
+		{
+			padding: 0px 10%;
+		}
+
+	}
+	@media screen and (min-width: 1024px) {
+		#about-container
+		{
+			padding-top:95px;
+		}
+		#downloads-container
+		{
+			flex-basis:20%;
+		}
+		.flex-container[breakpoint="1024"]
+		{
+			display: flex;
+		}
+		.flex-container[breakpoint="1024"] > .flex-item
+		{
+			margin-left: 30px;
+		}
+		.flex-container[breakpoint="1024"] > .flex-item:first-child
+		{
+			margin-left: 0;
+		}
+		.event-datetime
+		{
+			flex-basis: 85px;
+		}
+		.download-icon
+		{
+			width: 24px;
+			height: 24px;
+		}
+		.download-icon:after
+		{
+			width: 12px;
+			height: 12px;
+		}
+		
+	}
 </style>
+<script src="/static/js/Slideshow.js"></script>
+<script>
+	var slideshow_srcs = <?= json_encode($slideshow_srcs, true); ?>;
+	var sSlideshow_container = document.getElementById('slideshow-container');
+	var sSlideshow_prev_button = document.getElementById('slideshow-prev-button');
+	var sSlideshow_next_button = document.getElementById('slideshow-next-button');
+	var slideshow = new Slideshow(slideshow_srcs, sSlideshow_container);
+
+	sSlideshow_prev_button.addEventListener('click', function(){
+		slideshow.prev();
+	});
+	sSlideshow_next_button.addEventListener('click', function(){
+		slideshow.next();
+	});
+	
+	window.addEventListener('resize', function(){
+		// console.log('resizeee');
+		// console.log(window.innerHeight);
+		// slightbox_container.style.height = window.innerHeight + 'px';
+	});
+</script>

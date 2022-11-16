@@ -10,3 +10,13 @@ if( sCat_toggle_btn = document.getElementById('cat-toggle-btn'))
             body.setAttribute('category', 'projects');
     };
 }
+var sCat_name = document.getElementsByClassName('cat-name');
+if(sCat_name.length != 0)
+{
+    [].forEach.call(sCat_name, function(el, i){
+        let catName = el.id.replace('cat-', '');
+        el.addEventListener('click', function(){
+            body.setAttribute('category', catName);
+        });
+    });
+}

@@ -60,9 +60,16 @@ require_once('static/php/function.php');
 		<div id="main-header-btn-container" class="float-container">
 			<a href="/about" class="about-btn in-header middle">ABOUT</a>
 			<div id="cat-toggle-btn-container" class="float-container <?= $uri[1] ? 'inactive' : ''; ?>">
+				<? if(!$uri[1]){ ?>
 				<p id="cat-projects" class="cat-name middle">PROJECTS</p>
 				<div id="cat-toggle-btn"></div>
 				<p id="cat-commissions" class="cat-name middle">COMMISSIONS</p>
+				<? } else { ?>
+				<a id="cat-projects" class="cat-name middle" href="/?category=projects">PROJECTS</a>
+				<div id="cat-toggle-btn"></div>
+				<a id="cat-commissions" class="cat-name middle" href="/?category=commissions">COMMISSIONS</a>
+				<? } ?>
+					
 			</div>
 		</div>
 	</header>

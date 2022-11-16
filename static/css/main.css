@@ -82,12 +82,13 @@ a {
 }
 .small
 {
-    font-size: 16px;
-    line-height: 16px;
+    font-size: 14px;
+    line-height: 14px;
 }
 .cat-name
 {
     margin-top: 2px;
+    cursor: pointer;
 }
 #main-header-btn-container
 {
@@ -321,6 +322,65 @@ body[category="commissions"] #projects-grid-container
 {
     transform: translate(-50%, -50%) rotate(-45deg);
 }
+
+.right-arrow-icon,
+.left-arrow-icon
+{
+    width: 24px;
+    height: 24px;
+    position: relative;
+    cursor: pointer;
+}
+.right-arrow-icon
+{
+    float: right;
+}
+.left-arrow-icon
+{
+    float: left;
+}
+.right-arrow-icon:after,
+.left-arrow-icon:after
+{
+    content: "";
+    display: block;
+    position: absolute;
+    border-right: 3px solid #000;
+    border-bottom: 3px solid #000;
+    width: 70%;
+    height: 70%;
+    top: 50%;
+    left: 50%;      
+}
+.right-arrow-icon:before,
+.left-arrow-icon:before
+{
+    content: "";
+    display: block;
+    position: absolute;
+    border-top: 3px solid #000;
+    width: 100%;
+    /*left: 50%;*/
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.right-arrow-icon:after
+{
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+.left-arrow-icon:after
+{
+    transform: translate(-50%, -50%) rotate(135deg);
+}
+.right-arrow-icon:before
+{
+    left: 50%;
+}
+.left-arrow-icon:before
+{
+    left: 50%;
+}
+
 @media screen and (min-width: 321px) {
     .middle
     {
@@ -581,6 +641,12 @@ body[category="commissions"] #projects-grid-container
         margin-right: 20px;
     }
     .cross-icon
+    {
+        width: 36px;
+        height: 36px;
+    }
+    .left-arrow-icon,
+    .right-arrow-icon
     {
         width: 36px;
         height: 36px;
