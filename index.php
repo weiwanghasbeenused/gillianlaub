@@ -12,6 +12,5 @@ else if ($uri[1] == 'about')
     require_once("views/about.php");
 else 
     require_once("views/main.php");
-// require_once("views/badge.php");
 require_once("views/foot.php");
 ?>
