@@ -540,6 +540,53 @@ foreach($children as $child)
 		}
 		
 	}
+	@media (min-aspect-ratio: 2/1) {
+		.slide-container
+		{
+			width: 30vw;
+		}
+		.slide-container[order="-3"]
+		{
+			left: -40vw;
+			transform: translate(-50%, 0);
+		}
+		.slide-container[order="-2"]
+		{
+			left: -10vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="-1"]
+		{
+			left: 20vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+
+		.slide-container[order="0"]
+		{
+			left: 50vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="1"]
+		{
+			left: 80vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="2"]
+		{
+			left: 110vw;
+			transform: translate(-50%, 0);
+			transition: left .25s;
+		}
+		.slide-container[order="3"]
+		{
+			left: 140vw;
+			transform: translate(-50%, 0);
+		}
+	}
 </style>
 <script src="/static/js/Slideshow.js"></script>
 <script>
