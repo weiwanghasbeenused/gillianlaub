@@ -1,23 +1,30 @@
 <?
+define('__ROOT__', dirname(dirname(__FILE__)));
+require_once(__ROOT__.'/static/php/editFunctions.php');
+
 $current_section = isset($_GET['section']) ? $_GET['section'] : '';
 
+$project_item = $item;
 if(empty($current_section))
+	$current_item = $project_item;
+else
 {
-	$project_url = array($uri[3], $uri[4]);
-	$object_url = $project_url;
-	$project_id = $item['id'];
-	$sections = $oo->children($project_id);
-	$nav_items = $sections;
-	array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
+	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $current_section));
+	$current_item = $oo->get(end($temp));
 }
+
+$sections = $oo->children($project_item['id']);
+$nav_items = $sections;
+array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
 
 ?><section id="nav-container"><?
 foreach($nav_items as $n)
 {
 	$isActive = $current_section == $n['url'];
 	$class = $isActive ? "nav-item active" : "nav-item inactive";
-
-	?><a class="<?= $class; ?>"><?= $n['name1']; ?></a><?
+	$url = implode('/', $uri);
+	if(!$isActive) $url .= '?section=' . $n['url'];
+	?><a class="<?= $class; ?>" href="<?= $url; ?>"><?= $n['name1']; ?></a><?
 }
 ?></section><?
 
@@ -29,20 +36,68 @@ $fields = array(
 	'main' => array(
 		'name1' => array(
 			'displayName' => 'Project Name',
+			'slug' => 'project-name',
+			'var' => 'name1',
 			'type' => 'text'
 		),
 		'deck' => array(
 			'displayName' => 'Project Description',
-			'type' => 'textarea'
+			'slug' => 'project-description',
+			'var' => 'deck',
+			'type' => 'wysiwyg'
 		),
-		'media' => array(
+		// 'body' => array(
+		// 	'displayName' => 'Default Section',
+		// 	'slug' => 'default-section',
+		// 	'var' => 'body',
+		// 	'type' => 'select'
+		// ),
+		'address2' => array(
 			'displayName' => 'Project Thumbnail',
-			'type' => 'upload'
+			'slug' => 'project-thumbnail',
+			'var' => 'address2',
+			'type' => 'image'
 		),
 	),
+	'section' => array(
+		'name1' => array(
+			'displayName' => 'Section Name',
+			'slug' => 'section-name',
+			'var' => 'name1',
+			'type' => 'text'
+		),
+		'address1' => array(
+			'displayName' => 'Layout',
+			'slug' => 'layout',
+			'var' => 'address1',
+			'type' => 'checkbox'
+		),
+		'body' => array(
+			'displayName' => 'Body',
+			'slug' => 'body',
+			'var' => 'body',
+			'type' => 'wysiwyg'
+		),
+		// 'media' => array(
+		// 	'displayName' => 'Section Thumbnail',
+		// 	'slug' => 'section-thumbnail',
+		// 	'var' => 'media',
+		// 	'type' => 'upload'
+		// ),
+	),
 );
+$class_prefix = 'gillianlaub';
+$current_fields = empty($current_section) ? $fields['main'] : $fields['section'];
+// $wysiwyg_section_pattern = '/\[wysiwygsection wysiwygtag=\"(.*?)\"\]((:?.|\n|\r)*)\[\/wysiwygsection\]/';
+$wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
+$wysiwyg_section_ending_pattern = '[/wysiwygsection]';
+// var_dump($wysiwyg_section_pattern);
+$figure_pattern = '/\<figure class="'.$class_prefix .'\-wysiwyg\-figure"\>(.*?)\<\/figure\>/';
+$video_pattern = '/\<video class="'.$class_prefix .'\-wysiwyg\-video"\>(.*?)\<\/video\>/';
+$paragraph_pattern = '/\<p class="'.$class_prefix .'\-wysiwyg\-paragraph"\>(.*?)\<\/p\>/';
 
-
+$img_pattern = '/\<img class=\"wysiwygimg\" src="(.*)"\>/';
+$figcaption_pattern = '/\<figcaption class=\"wysiwygfigcaption\"\s*\>(.*?)\<\/figcaption\>/';
 // return false if object not updated,
 // else, return true
 function update_object(&$old, &$new, $siblings, $vars)
@@ -110,13 +165,7 @@ function update_object(&$old, &$new, $siblings, $vars)
 }
 
 ?><div id="body-container">
-	<div id="body"><?
-	// TODO: this code is duplicated in
-	// + add.php
-	// + browse.php
-	// + edit.php
-	// + link.php
-	// ancestors
+	<div><?
 	$a_url = $admin_path."browse";
 
 if ($rr->action != "update" && $uu->id)
@@ -125,10 +174,6 @@ if ($rr->action != "update" && $uu->id)
 	$medias = $oo->media($uu->id);
 	$num_medias = count($medias);
 
-	// add associations to media arrays:
-	// $medias[$i]["file"] is url of media file
-	// $medias[$i]["display"] is url of display file (diff for pdfs)
-	// $medias[$i]["type"] is type of media (jpg, gif, pdf, mp4, mp3)
 	for($i = 0; $i < $num_medias; $i++)
 	{
 		$m_padded = "".m_pad($medias[$i]['id']);
@@ -146,286 +191,71 @@ if ($rr->action != "update" && $uu->id)
 	$form_url = $admin_path."edit/".$uu->urls();
 // object contents
 ?><div id="form-container">
-
-		<!-- <form
-			method="post"
-			enctype="multipart/form-data"
-			action="<? echo $form_url; ?>"
-		> -->
 			<div class="form">
-				<script>
-				var default_editor_mode = '<?= $default_editor_mode; ?>';
-				function link(name) {
-						var linkURL = prompt('Enter a URL:', 'http://');
-						if (linkURL === null || linkURL === "") {
-							return;
-						}
-
-						document.execCommand('createlink', false, linkURL);
-				}
-
-				function addListeners(name) {
-					document.getElementById(name + '-html').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-					document.getElementById(name + '-bold').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-					document.getElementById(name + '-italic').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-					document.getElementById(name + '-link').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-					document.getElementById(name + '-indent').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-					document.getElementById(name + '-reset').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-				}
-
-				function resignImageContainer(name) {
-					var imagecontainer = document.getElementById(name + '-imagecontainer');
-					if (imagecontainer.style.display === 'block') {
-						imagecontainer.style.display = 'none';
-					}
-				}
-				function image(name) {
-					var imagecontainer = document.getElementById(name + '-imagecontainer');
-					var imagebox = document.getElementById(name + '-imagebox');
-					// toggle image box
-					if (imagecontainer.style.display !== 'block') {
-						imagecontainer.style.display = 'block';
-					} else {
-						imagecontainer.style.display = 'none';
-					}
-				}
-
-				function showToolBar(name) {
-					hideToolBars();
-					var tb = document.getElementById(name + '-toolbar');
-					tb.style.display = 'block';
-				}
-
-				function hideToolBars() {
-					var tbs = document.getElementsByClassName('toolbar');
-					Array.prototype.forEach.call(tbs, function(tb) { tb.style.display = 'none'});
-
-					var ics = document.getElementsByClassName('imagecontainer');
-					Array.prototype.forEach.call(ics, function(ic) { ic.style.display = 'none'});
-				}
-
-				function commitAll() {
-					var names = <?
-						$textnames = [];
-						foreach($vars as $var) {
-							if($var_info["input-type"][$var] == "textarea") {
-								$textnames[] = $var;
-							}
-						}
-						echo '["' . implode('", "', $textnames) . '"]'
-						?>;
-
-					for (var i = 0; i < names.length; i++) {
-						commit(names[i]);
-					}
-				}
-				function commit(name) {
-					var editable = document.getElementById(name + '-editable');
-					var textarea = document.getElementById(name + '-textarea');
-					if (editable.style.display === 'block') {
-						var html = editable.innerHTML;
-						textarea.value = html;    // update textarea for form submit
-					} else {
-						var html = textarea.value;
-						editable.innerHTML = html;    // update editable
-						textarea.value = editable.innerHTML;
-					}
-				}
-
-				function showrich(name) {
-					var bold = document.getElementById(name + '-bold');
-					var italic = document.getElementById(name + '-italic');
-					var link = document.getElementById(name + '-link');
-					var indent = document.getElementById(name + '-indent');
-					var reset = document.getElementById(name + '-reset');
-					var image = document.getElementById(name + '-image');
-					var imagecontainer = document.getElementById(name + '-imagecontainer');
-					var html = document.getElementById(name + '-html');
-					var txt = document.getElementById(name + '-txt');
-					var editable = document.getElementById(name + '-editable');
-					var textarea = document.getElementById(name + '-textarea');
-
-					textarea.style.display = 'none';
-					editable.style.display = 'block';
-
-					html.style.display = 'block';
-					txt.style.display = 'none';
-
-					bold.style.visibility = 'visible';
-					italic.style.visibility = 'visible';
-					indent.style.visibility = 'visible';
-					reset.style.visibility = 'visible';
-					link.style.visibility = 'visible';
-					image.style.visibility = 'visible';
-
-					var html = textarea.value;
-					editable.innerHTML = html;    // update editable
-				}
-
-				function sethtml(name, editorMode = 'regular') {
-					var bold = document.getElementById(name + '-bold');
-					var italic = document.getElementById(name + '-italic');
-					var link = document.getElementById(name + '-link');
-					var indent = document.getElementById(name + '-indent');
-					var reset = document.getElementById(name + '-reset');
-					var image = document.getElementById(name + '-image');
-					var imagecontainer = document.getElementById(name + '-imagecontainer');
-					var html = document.getElementById(name + '-html');
-					var txt = document.getElementById(name + '-txt');
-					var editable = document.getElementById(name + '-editable');
-					var textarea = document.getElementById(name + '-textarea');
-
-					textarea.style.display = 'block';
-					editable.style.display = 'none';
-
-					html.style.display = 'none';
-					txt.style.display = 'block';
-
-					bold.style.visibility = 'hidden';
-					italic.style.visibility = 'hidden';
-					indent.style.visibility = 'hidden';
-					reset.style.visibility = 'hidden';
-					link.style.visibility = 'hidden';
-					image.style.visibility = 'hidden';
-					imagecontainer.style.display = 'none';
-
-					var html = editable.innerHTML;
-					textarea.value = pretty(html);    // update textarea for form submit
-					if(editorMode == 'regular')
-						window.scrollBy(0, textarea.getBoundingClientRect().top); // scroll to the top of the textarea
-				}
-
-				function resetViews(name, editorMode = 'regular') {
-					commitAll();
-					var names = <?
-						$textnames = [];
-						foreach($vars as $var) {
-							if($var_info["input-type"][$var] == "textarea") {
-								$textnames[] = $var;
-							}
-						}
-						echo '["' . implode('", "', $textnames) . '"]'
-						?>;
-
-					
-					if(editorMode == 'regular')
-					{
-						for (var i = 0; i < names.length; i++) {
-							if (!(name && name === names[i]))
-								showrich(names[i]);
-						}
-					}
-					else if(editorMode == 'html')
-					{
-						for (var i = 0; i < names.length; i++) {
-							if (!(name && name === names[i]))
-								sethtml(names[i], default_editor_mode);
-						}
-					}
-						
-					
-				}
-
-				// pretifies html (barely) by adding two new lines after a </div>
-				function pretty(str) {
-					while(str.charCodeAt(0) == '9' || str.charCodeAt(0) == '10'){
-						str = str.substring(1, str.length);
-					}
-			        // return (str + '').replace(/(?<=<\/div>)(?!\n)/gi, '\n\n');
-                    return str;
-				}
-
-				function getSelectionText() {
-				    var text = "";
-				    if (window.getSelection) {
-				        text = window.getSelection().toString();
-				    } else if (document.selection && document.selection.type != "Control") {
-				        text = document.selection.createRange().text;
-				    }
-				    return text;
-				}
-
-				function indent(name){
-	                document.execCommand('formatBlock',false,'blockquote');
-                }
-
-				function reset(name){
-	                document.execCommand('formatBlock',false,'div');
-	                document.execCommand('removeFormat',false,'');
-                }
-
-				// add "autosave functionality" every 5 sec
-				// setInterval(function() {
-				// 	commitAll();
-				// }, 5000);
-				</script>
+				<script src="<?= $admin_path . 'static/js/edit.js' ?>"></script>
 				<?php
 				// show object data
-				foreach($vars as $var)
+				foreach($current_fields as $field)
 				{
+					$var = $field['var'];
+					$fieldType = $field['type'];
+					$displayName = $field['displayName'];
+					$fieldSlug = $field['slug'];
 				?><div class="field">
-					<div class="field-name"><? echo $var_info["label"][$var]; ?></div>
-					<div><?
-						if($var_info["input-type"][$var] == "textarea")
-						{
-
-                        // ** start experimental minimal wysiwig toolbar **
-
+					<div class="field-name"><? echo $displayName; ?></div>
+					<div class="field-body">
+					<? if($fieldType == "wysiwyg") { ?>
+                        <textarea name='<? echo $var; ?>' class='large dontdisplay' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
+                            if($current_item[$var])
+                                echo htmlentities($current_item[$var]);
+                        ?></textarea>
+                        <? if(!empty($current_item[$var])){
+                        	$body = trim($current_item[$var]);
+                        	$body = str_replace("\r", '', $body);
+                        	$body = str_replace("\n", '', $body);
+                        	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
+                        	$field_html = '';
+                        	var_dump($body_arr);
+                        	if(!empty($body_arr))
+                        	{
+                        		foreach($body_arr as $key => $section)
+                        		{
+                        			// $thisType = '';
+                        			$section = trim($section);
+                        			if(!empty($section))
+                        			{
+                        				preg_match($wysiwyg_section_opening_pattern, $section, $match);
+	                        			if(!empty($match) && !empty(trim($match[2]))){
+	                        				$thisType = $match[1];
+	                        				$thisContent = trim($match[2]);
+	                        				if($thisType == 'figure')
+	                        				{
+                        						$field_html .= '<div class="wysiwyg-section">' . renderWysiwygFigure($var, $key, $thisContent, $medias) . '</div>';
+                        						$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+	                        				}
+	                        				else if($thisType == 'p')
+	                        				{	
+	                        					$field_html .= '<div class="wysiwyg-section">' . renderWysiwygText($var, $thisContent) . '</div>';
+	                        					$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+	                        				}
+	                        			}
+                        			}                        			
+                        		}
+                        		echo $field_html;
+                        	}
+                        	else
+                        	{
+                        		echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                        	}
+                        }
+                        else
+                        {
+                        	echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                        }
+                                
                         ?>
 
-						<div id="<?echo $var;?>-toolbar" class="toolbar dontdisplay">
-							<?php if ($user == 'admin'): ?>
-								<a id="<? echo $var; ?>-html" class='right' href="#null" onclick="sethtml('<? echo $var; ?>', default_editor_mode);">html</a>
-								<a id="<? echo $var; ?>-txt" class='right dontdisplay' href="#null" onclick="showrich('<? echo $var; ?>');">rtf</a>
-							<?php endif; ?>
-							<a id="<? echo $var; ?>-bold" class='' href="#null" onclick="document.execCommand('bold',false,null);">bold</a>
-                            <a id="<? echo $var; ?>-italic" class='' href="#null" onclick="document.execCommand('italic',false,null);">italic</a> 
-                            <a id="<? echo $var; ?>-indent" class='' href="#null" onclick="indent('<? echo $var; ?>');">indent</a>
-                            <a id="<? echo $var; ?>-reset" class='' href="#null" onclick="reset('<? echo $var; ?>');">&nbsp;&times;&nbsp;</a>
-                            &nbsp;
-                            <a id="<? echo $var; ?>-link" class='' href="#null" onclick="link('<? echo $var; ?>');">link</a>
-							<a id="<? echo $var; ?>-image" class='' href="#null" onclick="image('<? echo $var; ?>');">image</a>
-							<div id="<?echo $var; ?>-imagecontainer" class='imagecontainer dontdisplay' style="background-color: #999;">
-								<span style="color: white;">insert an image...</span>
-								<div id="<? echo $var; ?>-imagebox" class='imagebox'>
-									<?
-										for($i = 0; $i < $num_medias; $i++) {
-											if ($medias[$i]["type"] != "pdf" && $medias[$i]["type"] != "mp4" && $medias[$i]["type"] != "mp3") {
-												echo '<div class="image-container" id="'. m_pad($medias[$i]['id']) .'-'. $var .'"><img src="'. $medias[$i]['display'] .'"></div>';
-												echo '<script>
-												document.getElementById("'. m_pad($medias[$i]['id']) .'-'. $var .'").onclick = (function() {
-													// closure for variable issue
-													return function() {
-														document.getElementById("'. $var .'-imagecontainer").style.display = "none";
-														document.getElementById("'. $var .'-editable").focus();
-														document.execCommand("insertImage", 0, "'. $medias[$i]['fileNoPath'] .'");
-													}
-												})();
-												</script>';
-											}
-										}
-									?>
-									</div>
-							</div>
-						</div>
-
-						<?php if ($user == 'guest'): ?>
-							<div name='<? echo $var; ?>' class='large editable' contenteditable='false' id='<? echo $var; ?>-editable' onclick="" style="display: block;">
-						<?php else: ?>
-							<div name='<? echo $var; ?>' class='large editable' contenteditable='true' id='<? echo $var; ?>-editable' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" style="display: block;">
-						<?php endif; ?>
-						<?
-                            if($item[$var])
-                                echo $item[$var];
-                        ?></div>
-
-                        <textarea name='<? echo $var; ?>' class='large dontdisplay' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
-                            if($item[$var])
-                                echo htmlentities($item[$var]);
-                        ?></textarea>
-
 						<script>
-							addListeners('<?echo $var; ?>');
 							<? 
 							if($user == 'admin' && $default_editor_mode == 'html') { ?>
 								sethtml('<? echo $var; ?>', default_editor_mode);
@@ -434,104 +264,38 @@ if ($rr->action != "update" && $uu->id)
 						<?
 						// ** end minimal wysiwig toolbar **
 						}
-						elseif($var == "url")
+						else if($fieldType == "image")
 						{
-						?><input name='<? echo $var; ?>'
-								type='<? echo $var_info["input-type"][$var]; ?>'
-								value='<? echo rawurldecode($item[$var]); ?>'
-								onclick="hideToolBars(); resetViews('', default_editor_mode);"
-								<?php if ($user == 'guest'): ?>
-									disabled = "disabled"
-								<?php endif; ?>
-								form="edit-form"
-						><?
+							echo renderImageBlock($var, '', $medias, $fieldSlug);
 						}
-						else
+						else if($fieldType == "checkbox")
 						{
-						?><input name='<? echo $var; ?>'
-								type='<? echo $var_info["input-type"][$var]; ?>'
-								<?
-									if($item[$var])
-										echo ' value="'.htmlspecialchars($item[$var], ENT_QUOTES).'" ';
-									else
-										echo ' value="" ';
-								?>
-								onclick="hideToolBars(); resetViews('', default_editor_mode);"
-								<?php if ($user == 'guest'): ?>
-									disabled = "disabled"
-								<?php endif; ?>
-								form="edit-form"
-						><?
+
+						?><?
+						}
+						else if($fieldType == "select")
+						{
+							$options = array();
+							if($field['slug'] == 'default-section')
+								$options = $sections;
+							if(!empty($options))
+							{
+								echo renderSelect($var, $current_item[$var], $options);
+							}
+						?><?
+						}
+						else if($fieldType == "text")
+						{
+
+						?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"><?
 						}
 					?></div>
 				</div><?
 				}
 				// show existing images
-				for($i = 0; $i < $num_medias; $i++)
-				{
-					$im = str_pad($i+1, 2, "0", STR_PAD_LEFT);
-				?><div class="existing-image">
-					<div class="field-name">Image <? echo $im; ?></div>
-					<div class='preview'>
-						<a href="<? echo $medias[$i]['file']; ?>" target="_blank">
-							<img src="<? echo $medias[$i]['display']; ?>">
-						</a>
-					</div>
-					<textarea name="captions[]" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"
-						<?php if ($user == 'guest'): ?>
-							disabled = "disabled"
-						<?php endif; ?>
-					><?
-						echo $medias[$i]["caption"];
-					?></textarea>
-					<span>rank</span>
-					<select name="ranks[<? echo $i; ?>]" form="edit-form"
-						<?php if ($user == 'guest'): ?>
-							disabled = "disabled"
-						<?php endif; ?>
-						><?
-						for($j = 1; $j <= $num_medias; $j++)
-						{
-							if($j == $medias[$i]["rank"])
-							{
-							?><option selected value="<? echo $j; ?>"><?
-								echo $j;
-							?></option><?php
-							}
-							else
-							{
-							?><option value="<? echo $j; ?>"><?
-								echo $j;
-							?></option><?php
-							}
-						}
-					?></select>
-					<label>
-						<input
-							type="checkbox"
-							name="deletes[<? echo $i; ?>]"
-							form="edit-form"
-							<?php if ($user == 'guest'): ?>
-								disabled = "disabled"
-							<?php endif; ?>
-						>
-					delete image</label>
-					<input
-						type="hidden"
-						name="medias[<? echo $i; ?>]"
-						value="<? echo $medias[$i]['id']; ?>"
-						form="edit-form"
-					>
-					<input
-						type="hidden"
-						name="types[<? echo $i; ?>]"
-						value="<? echo $medias[$i]['type']; ?>"
-						form="edit-form"
-					>
-				</div><?php
-				}
+				
 				// upload new images
-				if ($user != 'guest') {
+				
 					for($j = 0; $j < $max_uploads; $j++)
 					{
 						$im = str_pad(++$i, 2, "0", STR_PAD_LEFT);
@@ -545,7 +309,7 @@ if ($rr->action != "update" && $uu->id)
 						?></textarea-->
 					</div><?php
 					}
-				} ?>
+				?>
 				<div class="button-container">
 					<input
 						type='hidden'
@@ -592,10 +356,10 @@ else
 	foreach($vars as $var)
 	{
 		$new[$var] = addslashes($rr->$var);
-		if(isset($item[$var]))
-			$item[$var] = addslashes($item[$var]);
+		if(isset($current_item[$var]))
+			$current_item[$var] = addslashes($current_item[$var]);
 		else
-			$item[$var] = '';
+			$current_item[$var] = '';
 	}
 	$siblings = $oo->siblings($uu->id);
 	$updated = update_object($item, $new, $siblings, $vars);
@@ -669,3 +433,90 @@ else
 }
 ?></div>
 </div>
+<style>
+	.wysiwyg-section
+	{
+/*		padding:20px;*/
+		background-color:#dedede;
+/*		margin-bottom:5px;*/
+	}
+	.wysiwyg-edit-img
+	{
+		display: block;
+		cursor: pointer;
+	}
+	.wysiwyg-section textarea
+	{
+		background-color: #dedede;
+		cursor:pointer;
+		border:none;
+		resize: vertical;
+		padding: 5px;
+		display: block;
+	}
+	.wysiwyg-section textarea:focus
+	{
+		background-color: #fff;
+		outline:none;
+		cursor:text;
+	}
+
+	.wysiwyg-section textarea.wysiwyg-edit-figcaption
+	{
+		text-align: center;
+		padding-left: 30px;
+		padding-right: 30px;
+		margin-top:px;
+	}
+	
+	.wysiwyg-add-section {
+		cursor: pointer;
+		text-align: center;
+		color: #fff;
+		font-size: 12px;
+	}
+	.wysiwyg-add-toggle:hover,
+	.section-option:hover
+	{
+		background-color: #fff;
+		color: #000;
+	}
+	.wysiwyg-add-section .msg
+	{
+		display: inline-block;
+	}
+	.inline-icon
+	{
+/*		display: inline-block;*/
+		margin-right:5px;
+		font-size: 16px;
+
+	}
+	.toolbar
+	{
+		width: auto;
+	}
+	.msg
+	{
+/*		font-family: ;*/
+	}
+	.add-options-container,
+	.viewing-sectionOptions .add-prompt-container
+	{
+		display: none;
+	}
+	.viewing-sectionOptions .add-options-container
+	{
+		display: block;
+	}
+	.wysiwyg-add-toggle,
+	.section-option
+	{
+		padding: 5px;
+		background-color:#000;
+	}
+	.section-option
+	{
+		margin-top:2px;
+	}
+</style>

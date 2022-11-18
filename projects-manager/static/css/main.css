@@ -12,7 +12,7 @@ html, body, #page {
 
 html {
 	font-family: "Menlo", monospace;
-	font-size: 16px;
+	font-size: 14px;
 	line-height: 20px;
 
 	/* safari can't handle fonts */
@@ -101,11 +101,17 @@ aside {
 
 .field,
 .image-upload {
-	margin: 15px 0;
+	margin-bottom: 20px;
 }
 
 .field-name {
-    display: inline-block;
+    display: block;
+/*    margin-bottom: 5px;*/
+/*    font-size: 14px;*/
+}
+.field-body
+{
+	border: 1px solid #000;
 }
 
 .editable {
@@ -127,6 +133,7 @@ aside {
 textarea,
 input[type="text"] {
 	padding: 5px;
+	border: none;
 }
 
 input[type="datetime-local"] {
@@ -163,13 +170,16 @@ textarea.small {
 }
 
 .toolbar {
-	width: 484px;
+/*	width: 484px;*/
 	position: sticky;
 	position: -webkit-sticky;
 	top: 0px;
-
+	display: none;
 }
-
+.viewing-toolbar .toolbar
+{
+	display: block;
+}
 .imagebox {
 	height: 5em;
 	background-color: #999;
@@ -179,27 +189,44 @@ textarea.small {
 	display: flex;
 	flex-direction: row;
 }
-
-.image-container {
+.media-toolbar
+{
+	white-space: nowrap;
+	padding: 5px;
+	background-color: #fff;
+}
+.toolbar-image-container {
 	cursor: pointer;
-	height: 100%;
-	margin-left: 5px;
+	display: inline-block;
+	width: 120px;
+	position: relative;
+	height: 80px;
 }
 
-.image-container:hover,
-.image-container:active {
-	opacity: 0.5;
+.toolbar-image-container:hover,
+.toolbar-image-container:active {
+	opacity: 0.75;
 }
 
-.image-container:first-of-type {
-	margin-left: 0px;
+.toolbar-image-container:first-of-type {
+/*	margin-left: 0px;*/
 }
 
-.image-container > img {
-	height: 100%;
-	width: auto;
+.toolbar-image-container > img {
+	height:100%;
+/*	width:100%;*/
+	object-fit: contain;
+/*	display: block;*/
 }
+.image-container
+{
+/*	padding: 5px;*/
 
+}
+img
+{
+	display: block;
+}
 img,
 textarea,
 input[type="text"],
@@ -334,7 +361,9 @@ select {
 	margin-left:10px;
 }
 .cat-item.active,
-.cat-item:hover
+.cat-item:hover,
+.nav-item.active,
+.nav-item:hover
 {
 	background-color: #dedede;
 	border-color: #dedede;
@@ -411,6 +440,11 @@ footer
 }
 .nav-item.active
 {
+	background-color: #dedede;
+}
+#form-container
+{
+	padding:20px;
 	background-color: #dedede;
 }
 @media screen and (max-device-width: 568px) {

@@ -92,31 +92,6 @@ else
 			{
 				?><div id="gallery-container" class="scroll-gallery-container large"><? 
 					$body = $detail_item['body'];
-					$img_tag_pattern = '/\<img\ssrc\=\"(.*?)\">/';
-					$media_id_pattern = '/\/media\/(.*?)\./';
-					preg_match_all($img_tag_pattern, $body, $temp);
-					if(!empty($temp) && !empty($temp[1]))
-					{
-						foreach($temp[1] as $key => $src)
-						{
-							$find = $temp[0][$key];
-							$image_class = 'gallery-image lightbox-btn';
-							$size = getimagesize(substr($src, 1, strlen($src)));
-							if($size[0] < $size[1])
-								$image_class .= ' portrait';
-							else if($size[0] > $size[1])
-								$image_class .= ' landscape';
-							else
-								$image_class .= ' square';
-
-							preg_match($media_id_pattern, $src, $media_id);
-							$media_id = intval($media_id[1]);
-							$this_m = $media_key_as_id[$media_id];
-							// $caption = $this_m['caption'];
-							$replacement = '<figure><img class="'.$image_class.'" src="'.$src.'" loading="lazy" alt="'.$this_m['caption'].'"><figcaption class="gallery-caption caption">'.$this_m['caption'].'</figcaption></figure>';
-							$body = str_replace($find, $replacement, $body);
-						}
-					}
 					echo $body;
 				 ?></div><?
 			}
