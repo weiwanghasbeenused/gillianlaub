@@ -11,4 +11,5 @@ else if($uri[2] == 'browse')
 else if($uri[2] == 'edit')
 	require_once("views/edit.php");
 require_once("views/foot.php");
+
 ?>

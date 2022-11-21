@@ -27,7 +27,11 @@ body {
     max-width: 100%;
     margin: 0px auto;
 }
-
+body.viewing-popup-window
+{
+    overflow: hidden;
+    pointer-events: none;
+}
 /* this is so that the text on link.php looks normal. */
 p:first-of-type {
 	margin-top: 0px;
@@ -194,6 +198,7 @@ textarea.small {
 	white-space: nowrap;
 	padding: 5px;
 	background-color: #fff;
+	overflow:scroll;
 }
 .toolbar-image-container {
 	cursor: pointer;
@@ -326,6 +331,13 @@ select {
 	padding: 10px 20px;
 	display: inline-block;
 	background-color: #fff;
+	cursor:pointer;
+}
+button.btn
+{
+	font-family: "Menlo", monospace;
+	font-size: 14px;
+	line-height: 20px;
 }
 .btn:hover
 {
@@ -336,7 +348,14 @@ select {
 {
 	margin-left: 5px;
 }
-
+.btn.on-grey
+{
+	background-color: #dedede;
+}
+.btn.on-grey:hover
+{
+	background-color: #fff;
+}
 #category-container
 {
 /*	position:relative;*/
@@ -446,6 +465,31 @@ footer
 {
 	padding:20px;
 	background-color: #dedede;
+}
+.full-width{
+	width: 100vw;
+	max-width: 100%;
+}
+.full-height
+{
+	height: 100vh;
+}
+.popup-window-mask
+{
+	position: fixed;
+	top:0;
+	left:0;
+	opacity: 0;
+	pointer-events: none;
+	background-color: #fff;
+	
+	z-index: 250;
+}
+body.viewing-popup-window .popup-window-mask
+{
+    opacity: 0.75;
+    pointer-events: auto;
+    transition: opacity .35s;
 }
 @media screen and (max-device-width: 568px) {
 	html {

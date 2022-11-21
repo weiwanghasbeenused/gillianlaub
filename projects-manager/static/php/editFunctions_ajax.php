@@ -9,9 +9,9 @@ if(!empty($_POST)){
 		echo $function(...$params);
 	}
 	else
-		echo 'ff';
+		echo 'false';
 
 }
 else
-	echo 'ff';
+	echo 'false';
 

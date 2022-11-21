@@ -16,23 +16,25 @@ function renderSelect($var, $value, $options){
 	}
 	return $output; 
 }
-function renderImageBlock($var, $value, $media, $class=""){
-	$output = '';
-	if(!empty($media))
-	{
-		if(empty($value))
-			$value = m_url($media[0]);
-		$toolbar_html = '<div class="toolbar media-toolbar">';
-		foreach($media as $m)
-		{
-			$toolbar_html .= '<div class="toolbar-image-container" ><img onclick="useThisImage(this);" src="'.m_url($m).'"></div>';
-		}
-		$toolbar_html .= '</div>';
-		$output .= '<div class="image-container '.$class.'">'.$toolbar_html.'<img onclick="displayToolbar(this);" src="'. $value .'"></div>';
-	}
+function renderImageBlock($var, $value, $class="", $media=array()){
+	$output = '<div class="image-container '.$class.'">'.renderMediaToolbar($media);
+	if(empty($value))
+		$value = 'null';
+	$output .= '<img class="display-image" onclick="displayMediaToolbar(this, medias);" src="'. $value .'">';
+	$output .= '</div>';
 	return $output;
 }
-
+function renderMediaToolbar($media, $id = ''){
+	$toolbar_html = '<div class="media-toolbar-toggle" onclick="displayMediaToolbar(this, medias)"></div>';
+	$toolbar_html .= empty($media) ? '<div id="'.$id.'" class="toolbar media-toolbar empty">' : '<div id="'.$id.'" class="toolbar media-toolbar">';
+	$toolbar_html .= '<div class="empty-msg">Please upload media first.</div>';
+	foreach($media as $m)
+	{
+		$toolbar_html .= '<div class="toolbar-image-container" ><img onclick="useThisImage(this);" src="'.m_url($m).'"></div>';
+	}
+	$toolbar_html .= '</div>';
+	return $toolbar_html;
+}
 function renderWysiwygElement(){
 
 }
@@ -41,22 +43,24 @@ function renderWysiwygAdd($var){
 	return $output;
 }
 
-function renderWysiwygFigure($var, $idx, $content, $media){
+function renderWysiwygFigure($var, $content, $media=array()){
 	global $wysiwygPattern;
 	$output = '';
 	preg_match($wysiwygPattern['img'], $content, $img_match);
 	if(!empty($img_match)){
 		$src = $img_match[1];
-		$caption = '';
-		if(strpos($content, '<figcaption class="wysiwygfigcaption">') !== false){
-			preg_match($wysiwygPattern['figcaption'], $content, $figcaption_match);
-			if(!empty($figcaption_match))
-				$caption = $figcaption_match[1];
-		}
-		$media_html = renderImageBlock($var, $src, $media, 'wysiwyg-edit-img-wrapper');
-		$output .= '<div class="wysiwyg-edit-container wysiwyg-edit-figure" fieldname="'.$var.'">'.$media_html.'<textarea class="wysiwyg-edit-figcaption" placeholder="click to add caption . . ." rows="2">' . $caption . '</textarea></div>'; 
-		// $output .= renderWysiwygAdd($var);
 	}
+	else
+		$src = 'null';
+
+	$caption = '';
+	if(strpos($content, '<figcaption class="wysiwygfigcaption">') !== false){
+		preg_match($wysiwygPattern['figcaption'], $content, $figcaption_match);
+		if(!empty($figcaption_match))
+			$caption = $figcaption_match[1];
+	}
+	$media_html = renderImageBlock($var, $src, 'wysiwyg-edit-img-wrapper', $media);
+	$output .= '<div class="wysiwyg-edit-container wysiwyg-edit-figure" fieldname="'.$var.'">'.$media_html.'<textarea class="wysiwyg-edit-figcaption" placeholder="click to add caption . . ." rows="2">' . $caption . '</textarea></div>'; 
 	return $output;
 }
 
@@ -69,4 +73,9 @@ function renderWysiwygText($var, $content, $acceptEmptyContent = false){
 		$output = '<textarea class="wysiwyg-edit-container wysiwyg-edit-p" fieldname="'.$var.'" rows="7" placeholder="Click to start writing...">'.$output.'</textarea>'; 
 	}
 	return $output;
+}
+
+function trimBreaksFromSides($string){
+	$output = str_replace('<br>', "\n\r", $string);
+	return trim($output);
 }

@@ -115,6 +115,7 @@ if ($view == "logout")
 		<link rel="stylesheet" href="<? echo $admin_path; ?>static/css/main.css">
 	</head>
 	<body>
+		<div class="popup-window-mask full-width full-height"></div>
 		<div id="page">
 			<header class="centre">
 				<div id="nav">

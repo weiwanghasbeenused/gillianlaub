@@ -46,12 +46,6 @@ $fields = array(
 			'var' => 'deck',
 			'type' => 'wysiwyg'
 		),
-		// 'body' => array(
-		// 	'displayName' => 'Default Section',
-		// 	'slug' => 'default-section',
-		// 	'var' => 'body',
-		// 	'type' => 'select'
-		// ),
 		'address2' => array(
 			'displayName' => 'Project Thumbnail',
 			'slug' => 'project-thumbnail',
@@ -78,28 +72,18 @@ $fields = array(
 			'var' => 'body',
 			'type' => 'wysiwyg'
 		),
-		// 'media' => array(
-		// 	'displayName' => 'Section Thumbnail',
-		// 	'slug' => 'section-thumbnail',
-		// 	'var' => 'media',
-		// 	'type' => 'upload'
-		// ),
 	),
 );
 $class_prefix = 'gillianlaub';
 $current_fields = empty($current_section) ? $fields['main'] : $fields['section'];
-// $wysiwyg_section_pattern = '/\[wysiwygsection wysiwygtag=\"(.*?)\"\]((:?.|\n|\r)*)\[\/wysiwygsection\]/';
 $wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
 $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
-// var_dump($wysiwyg_section_pattern);
 $figure_pattern = '/\<figure class="'.$class_prefix .'\-wysiwyg\-figure"\>(.*?)\<\/figure\>/';
 $video_pattern = '/\<video class="'.$class_prefix .'\-wysiwyg\-video"\>(.*?)\<\/video\>/';
 $paragraph_pattern = '/\<p class="'.$class_prefix .'\-wysiwyg\-paragraph"\>(.*?)\<\/p\>/';
-
 $img_pattern = '/\<img class=\"wysiwygimg\" src="(.*)"\>/';
 $figcaption_pattern = '/\<figcaption class=\"wysiwygfigcaption\"\s*\>(.*?)\<\/figcaption\>/';
-// return false if object not updated,
-// else, return true
+
 function update_object(&$old, &$new, $siblings, $vars)
 {
 	global $oo;
@@ -168,10 +152,10 @@ function update_object(&$old, &$new, $siblings, $vars)
 	<div><?
 	$a_url = $admin_path."browse";
 
-if ($rr->action != "update" && $uu->id)
+if ($rr->action != "update" && $current_item['id'])
 {
 	// get existing image data
-	$medias = $oo->media($uu->id);
+	$medias = $oo->media($current_item['id']);
 	$num_medias = count($medias);
 
 	for($i = 0; $i < $num_medias; $i++)
@@ -190,161 +174,167 @@ if ($rr->action != "update" && $uu->id)
 	}
 	$form_url = $admin_path."edit/".$uu->urls();
 // object contents
-?><div id="form-container">
-			<div class="form">
-				<script src="<?= $admin_path . 'static/js/edit.js' ?>"></script>
-				<?php
-				// show object data
-				foreach($current_fields as $field)
-				{
-					$var = $field['var'];
-					$fieldType = $field['type'];
-					$displayName = $field['displayName'];
-					$fieldSlug = $field['slug'];
-				?><div class="field">
-					<div class="field-name"><? echo $displayName; ?></div>
-					<div class="field-body">
-					<? if($fieldType == "wysiwyg") { ?>
-                        <textarea name='<? echo $var; ?>' class='large dontdisplay' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
-                            if($current_item[$var])
-                                echo htmlentities($current_item[$var]);
-                        ?></textarea>
-                        <? if(!empty($current_item[$var])){
-                        	$body = trim($current_item[$var]);
-                        	$body = str_replace("\r", '', $body);
-                        	$body = str_replace("\n", '', $body);
-                        	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
-                        	$field_html = '';
-                        	var_dump($body_arr);
-                        	if(!empty($body_arr))
-                        	{
-                        		foreach($body_arr as $key => $section)
-                        		{
-                        			// $thisType = '';
-                        			$section = trim($section);
-                        			if(!empty($section))
-                        			{
-                        				preg_match($wysiwyg_section_opening_pattern, $section, $match);
-	                        			if(!empty($match) && !empty(trim($match[2]))){
-	                        				$thisType = $match[1];
-	                        				$thisContent = trim($match[2]);
-	                        				if($thisType == 'figure')
-	                        				{
-                        						$field_html .= '<div class="wysiwyg-section">' . renderWysiwygFigure($var, $key, $thisContent, $medias) . '</div>';
-                        						$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
-	                        				}
-	                        				else if($thisType == 'p')
-	                        				{	
-	                        					$field_html .= '<div class="wysiwyg-section">' . renderWysiwygText($var, $thisContent) . '</div>';
-	                        					$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
-	                        				}
-	                        			}
-                        			}                        			
-                        		}
-                        		echo $field_html;
-                        	}
-                        	else
-                        	{
-                        		echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
-                        	}
-                        }
-                        else
-                        {
-                        	echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
-                        }
-                                
-                        ?>
+?>
+<script>
+	var toid = <?= $current_item['id']; ?>;
+	var medias = <?= json_encode($medias, true); ?>;
+	console.log(medias);
+</script>
+<div id="form-container">
+	<div id="media-toolbar-template" class="dontdisplay"><?
+		echo renderMediaToolbar($medias, 'media-toolbar-template');
+	?></div>
+	<div class="form">
+		<script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
+		<?php
+		// show object data
+		foreach($current_fields as $field)
+		{
+			$var = $field['var'];
+			$fieldType = $field['type'];
+			$displayName = $field['displayName'];
+			$fieldSlug = $field['slug'];
+		?><div class="field">
+			<div class="field-name"><? echo $displayName; ?></div>
+			<div class="field-body">
+			<? if($fieldType == "wysiwyg") { ?>
+                <textarea name='<? echo $var; ?>' class='large dontdisplay' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
+                    if($current_item[$var])
+                        echo htmlentities($current_item[$var]);
+                ?></textarea>
+                <? if(!empty($current_item[$var])){
+                	$body = trim($current_item[$var]);
+                	$body = str_replace("\r", '', $body);
+                	$body = str_replace("\n", '', $body);
+                	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
+                	$field_html = '';
+                	if(!empty($body_arr))
+                	{
+                		foreach($body_arr as $key => $section)
+                		{
+                			$section = trim($section);
+                			if(!empty($section))
+                			{
+                				preg_match($wysiwyg_section_opening_pattern, $section, $match);
+                    			if(!empty($match) && !empty(trim($match[2]))){
+                    				$thisType = $match[1];
+                    				$thisContent = trimBreaksFromSides($match[2]);
+                    				if($thisType == 'figure')
+                    				{
+                						$field_html .= '<div class="wysiwyg-section">' . renderWysiwygFigure($var, $thisContent, $medias) . '</div>';
+                						$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                    				}
+                    				else if($thisType == 'p' && !empty($thisContent))
+                    				{
+                    					$field_html .= '<div class="wysiwyg-section">' . renderWysiwygText($var, $thisContent) . '</div>';
+                    					$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                    				}
+                    			}
+                			}                        			
+                		}
+                		echo $field_html;
+                	}
+                	else
+                		echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                }
+                else
+                	echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                        
+                ?>
 
-						<script>
-							<? 
-							if($user == 'admin' && $default_editor_mode == 'html') { ?>
-								sethtml('<? echo $var; ?>', default_editor_mode);
-							<? } ?>
-						</script>
-						<?
-						// ** end minimal wysiwig toolbar **
-						}
-						else if($fieldType == "image")
-						{
-							echo renderImageBlock($var, '', $medias, $fieldSlug);
-						}
-						else if($fieldType == "checkbox")
-						{
-
-						?><?
-						}
-						else if($fieldType == "select")
-						{
-							$options = array();
-							if($field['slug'] == 'default-section')
-								$options = $sections;
-							if(!empty($options))
-							{
-								echo renderSelect($var, $current_item[$var], $options);
-							}
-						?><?
-						}
-						else if($fieldType == "text")
-						{
-
-						?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"><?
-						}
-					?></div>
-				</div><?
+				<script>
+					<? 
+					if($user == 'admin' && $default_editor_mode == 'html') { ?>
+						sethtml('<? echo $var; ?>', default_editor_mode);
+					<? } ?>
+				</script>
+				<?
+				// ** end minimal wysiwig toolbar **
 				}
-				// show existing images
-				
-				// upload new images
-				
-					for($j = 0; $j < $max_uploads; $j++)
+				else if($fieldType == "image")
+				{
+					// var_dump($current_item[$var]);
+					echo renderImageBlock($var, $current_item[$var], $fieldSlug, $medias);
+				}
+				else if($fieldType == "checkbox")
+				{
+
+				?><?
+				}
+				else if($fieldType == "select")
+				{
+					$options = array();
+					if($field['slug'] == 'default-section')
+						$options = $sections;
+					if(!empty($options))
 					{
-						$im = str_pad(++$i, 2, "0", STR_PAD_LEFT);
-					?><div class="image-upload">
-						<span class="field-name">Image <? echo $im; ?></span>
-						<span>
-							<input type="file" name="uploads[]" form="edit-form">
-						</span>
-						<!--textarea name="captions[]"><?php
-								echo $medias[$i]["caption"];
-						?></textarea-->
-					</div><?php
+						echo renderSelect($var, $current_item[$var], $options);
 					}
-				?>
-				<div class="button-container">
-					<input
-						type='hidden'
-						name='action'
-						value='update'
-						form="edit-form"
-					>
-					<input
-						type='button'
-						name='cancel'
-						value='Cancel'
-						onClick="<? echo $js_back; ?>"
-						form="edit-form"
-					>
-					<input
-						type='submit'
-						name='submit'
-						value='Update Object'
-						onclick='commitAll();'
-						form="edit-form"
-						<?php if ($user == 'guest'): ?>
-							disabled = "disabled"
-						<?php endif; ?>
-					>
-				</div>
-			</div>
-		<!-- </form> -->
-		<form
-			method="post"
-			enctype="multipart/form-data"
-			action="<? echo $form_url; ?>"
-			id="edit-form"
-		>
-		</form>
+				?><?
+				}
+				else if($fieldType == "text")
+				{
+				?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"><?
+				}
+			?></div>
+		</div><?
+		}
+		?>
+		<div id="btn-openMediaContainer" class="btn on-grey" onclick="openMediaContainer();">Upload media</div>
+		<div id="media-upload-container"><div id="btn-closeMediaContainer" class="icon-cross" onclick="closeMediaContainer();">&times;</div><iframe src="/projects-manager/views/mediaForm.php"></iframe></div>
+		<script>
+			var media_path = '<?= $media_path; ?>';
+			var iframe = document.querySelector('#media-upload-container > iframe').contentWindow;
+			var temp = document.getElementById('btn-openMediaContainer');
+			temp.addEventListener('click', function(){
+				iframe.postMessage(toid, location.origin);
+			});
+			// console.log(medias);
+			window.addEventListener("message", (event) => {
+				console.log(event.data);
+				let response = JSON.parse(event.data);
+				for (const idx in response) {
+					medias.push(response[idx]);
+				}
+				updateMediaToolbar(medias);
+			}, false);
+		</script>
+		
+		<div class="button-container">
+			<input
+				type='hidden'
+				name='action'
+				value='update'
+				form="edit-form"
+			>
+			<input
+				type='button'
+				name='cancel'
+				value='Cancel'
+				onClick="<? echo $js_back; ?>"
+				form="edit-form"
+			>
+			<input
+				type='submit'
+				name='submit'
+				value='Update Object'
+				onclick='commitAll();'
+				form="edit-form"
+				<?php if ($user == 'guest'): ?>
+					disabled = "disabled"
+				<?php endif; ?>
+			>
+		</div>
 	</div>
+	<!-- </form> -->
+	<form
+		method="post"
+		enctype="multipart/form-data"
+		action="<? echo $form_url; ?>"
+		id="edit-form"
+	>
+	</form>
+</div>
 <?php
 }
 // THIS CODE NEEDS TO BE FACTORED OUT SO HARD
@@ -518,5 +508,91 @@ else
 	.section-option
 	{
 		margin-top:2px;
+	}
+	/*.preview-cell:hover .preview-removethisbtn:hover
+	{
+		background-color: #000;
+		color: #fff;
+	}
+	.preview-removethisbtn:hover + .preview-msg .preview-filename
+	{
+		display: none;
+	}
+	.preview-removethisbtn:hover + .preview-msg:after
+	{
+		content: 'remove this image';
+		display: block;
+	}*/
+	.viewing-media-upload #media-upload-container
+	{
+		opacity: 1;
+		pointer-events: auto;
+	}
+	#media-upload-container
+	{
+		position: fixed;
+		opacity: 0;
+		left: 50%;
+		width: 500px;
+		height: 90vh;
+		transition: opacity .35s;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		pointer-events: none;
+		background-color: #fff;
+		z-index: 500;
+		box-shadow: 5px 5px 12px #000;
+		background-color: #dedede;
+	}
+	#media-upload-container iframe
+	{
+		border: none;
+		width: 100%;
+		height: 100%;
+	}
+	#btn-closeMediaContainer
+	{
+		font-size: 20px;
+		position: absolute;
+		padding: 11px 15px;
+		left: 10px;
+		top: 10px;
+		cursor: pointer;
+	}
+	#btn-closeMediaContainer:hover
+	{
+		background-color: #000;
+		color: #fff;
+	}
+	.empty-msg
+	{
+		display: none;
+	}
+	.media-toolbar.empty .empty-msg
+	{
+		display: block;
+	}
+	.media-toolbar-toggle:after
+	{
+		content: "Choose uploaded image";
+		display: block;
+		text-align: center;
+		padding: 5px;
+		cursor:pointer;
+		font-size: 12px;
+	}
+	.media-toolbar-toggle:hover:after
+	{
+		background-color: #fff;
+	}
+	.viewing-toolbar .media-toolbar-toggle:after
+	{
+		content: "\0000D7";
+		font-size: 16px;
+		background-color: #fff;
+	}
+	img[src="null"]
+	{
+		display: none;
 	}
 </style>
