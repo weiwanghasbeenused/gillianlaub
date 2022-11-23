@@ -55,14 +55,13 @@ if($pageType == 'detail')
 		$col_number = '2-3';
 	$project_description = empty($item['deck']) ? false : $item['deck'];
 }
-
+$project_site_url = false;
 $pattern_projectSite = '/\[project\-site\]\((.*?)\)/';
-preg_match($pattern_projectSite, $item['notes'], $temp);
-
-if(!empty($temp))
-	$project_site_url = $temp[1];
-else
-	$project_site_url = false;
+if($item['notes']){
+	preg_match($pattern_projectSite, $item['notes'], $temp);
+	if(!empty($temp))
+		$project_site_url = $temp[1];
+}
 
 ?>
 <main id="project-container" class="main-container padding-wrapper">
@@ -91,7 +90,7 @@ else
 			else if($current_layout == 'scroll')
 			{
 				?><div id="gallery-container" class="scroll-gallery-container large"><? 
-					$body = $detail_item['body'];
+					$body = $gg->render($detail_item['body']);
 					echo $body;
 				 ?></div><?
 			}

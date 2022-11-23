@@ -184,6 +184,10 @@ textarea.small {
 {
 	display: block;
 }
+.viewing-toolbar .toolbar.media-toolbar
+{
+	display: flex;
+}
 .imagebox {
 	height: 5em;
 	background-color: #999;
@@ -196,21 +200,23 @@ textarea.small {
 .media-toolbar
 {
 	white-space: nowrap;
-	padding: 5px;
+/*	padding: 5px;*/
 	background-color: #fff;
 	overflow:scroll;
 }
 .toolbar-image-container {
 	cursor: pointer;
 	display: inline-block;
-	width: 120px;
 	position: relative;
-	height: 80px;
+	height: 100px;
+	padding: 10px 5px;
+	flex: 0 0 120px;
 }
 
 .toolbar-image-container:hover,
 .toolbar-image-container:active {
-	opacity: 0.75;
+/*	opacity: 0.75;*/
+	background-color: #00f;
 }
 
 .toolbar-image-container:first-of-type {
@@ -333,7 +339,8 @@ select {
 	background-color: #fff;
 	cursor:pointer;
 }
-button.btn
+button.btn,
+input.btn
 {
 	font-family: "Menlo", monospace;
 	font-size: 14px;

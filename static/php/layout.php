@@ -57,7 +57,9 @@ function render3ColsGrid($items, $id='', $itemType='link'){
 function renderLinkItem($item, $class=''){
 	global $oo;
 	$media = $oo->media($item['id']);
-	if(!empty($media))
+	if(!empty($item['address2']))
+		$thumbnail = '<div class="grid-item-thumbnail-container"><img class="grid-item-thumbnail" src="'. m_filename_to_url($item['address2']) .'"></div>';
+	else if(!empty($media))
 		$thumbnail = '<div class="grid-item-thumbnail-container"><img class="grid-item-thumbnail" src="'. m_url($media[0]) .'"></div>';
 	else
 		$thumbnail = '';

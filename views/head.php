@@ -12,6 +12,8 @@ $mm = new Media();
 $ww = new Wires();
 $uu = new URL();
 
+$gg = new WhatYouGet();
+
 if($uu->id)
 	$item = $oo->get($uu->id);
 else

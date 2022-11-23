@@ -137,7 +137,8 @@ else // respond with uploaded media srcs
 				'id' =>  $insert_id,
 				'caption' => '',
 				'type' => $m_type,
-				'file' => '/media/'.$m_file
+				'file' => '/media/'.$m_file,
+				'filename' => $m_file
 			);
 			if(move_uploaded_file($tmp_name, $m_dest)) {
 				if($resize)

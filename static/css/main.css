@@ -256,9 +256,13 @@ body[category="commissions"] #projects-grid-container
 {
     text-align: center;
 }
-.scroll-gallery-container figure
+.gallery-element
 {
-    display: inline-block;
+    margin-bottom: 70px;
+}
+.gallery-image
+{
+    margin: 0 auto;
 }
 .caption
 {
@@ -517,8 +521,6 @@ body[category="commissions"] #projects-grid-container
     }
     .gallery-caption
     {
-/*        font-size: 18px;*/
-/*        margin-top: 14px;*/
     }
     #cat-toggle-btn
     {

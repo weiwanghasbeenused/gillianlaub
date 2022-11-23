@@ -5,14 +5,16 @@ require_once(__ROOT__.'/static/php/editFunctions.php');
 $current_section = isset($_GET['section']) ? $_GET['section'] : '';
 
 $project_item = $item;
+$form_url = $admin_path."edit/".$uu->urls();
 if(empty($current_section))
 	$current_item = $project_item;
 else
 {
 	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $current_section));
 	$current_item = $oo->get(end($temp));
+	$form_url .= '?section=' . $current_section;
 }
-
+$current_item['name1'];
 $sections = $oo->children($project_item['id']);
 $nav_items = $sections;
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
@@ -23,7 +25,8 @@ foreach($nav_items as $n)
 	$isActive = $current_section == $n['url'];
 	$class = $isActive ? "nav-item active" : "nav-item inactive";
 	$url = implode('/', $uri);
-	if(!$isActive) $url .= '?section=' . $n['url'];
+	if(!empty($n['url']))
+		$url .= '?section=' . $n['url'];
 	?><a class="<?= $class; ?>" href="<?= $url; ?>"><?= $n['name1']; ?></a><?
 }
 ?></section><?
@@ -74,15 +77,26 @@ $fields = array(
 		),
 	),
 );
+$checkbox_options = array(
+	'layout' => array(
+		'scroll' => array(
+			'displayName' => 'Scroll',
+			'slug' => 'scroll',
+			'checked' => true
+		),
+		'grid' => array(
+			'displayName' => 'Grid',
+			'slug' => 'grid',
+			'checked' => false
+		),
+	),
+);
+$select_options = array();
+
 $class_prefix = 'gillianlaub';
 $current_fields = empty($current_section) ? $fields['main'] : $fields['section'];
 $wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
 $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
-$figure_pattern = '/\<figure class="'.$class_prefix .'\-wysiwyg\-figure"\>(.*?)\<\/figure\>/';
-$video_pattern = '/\<video class="'.$class_prefix .'\-wysiwyg\-video"\>(.*?)\<\/video\>/';
-$paragraph_pattern = '/\<p class="'.$class_prefix .'\-wysiwyg\-paragraph"\>(.*?)\<\/p\>/';
-$img_pattern = '/\<img class=\"wysiwygimg\" src="(.*)"\>/';
-$figcaption_pattern = '/\<figcaption class=\"wysiwygfigcaption\"\s*\>(.*?)\<\/figcaption\>/';
 
 function update_object(&$old, &$new, $siblings, $vars)
 {
@@ -171,19 +185,16 @@ if ($rr->action != "update" && $current_item['id'])
 			$medias[$i]["display"] = $admin_path."media/mp3.png";
 		else
 			$medias[$i]["display"] = $medias[$i]["file"];
+		$medias[$i]["filename"] = m_pad($medias[$i]['id']) . '.' . $medias[$i]['type'];
 	}
-	$form_url = $admin_path."edit/".$uu->urls();
 // object contents
 ?>
 <script>
 	var toid = <?= $current_item['id']; ?>;
 	var medias = <?= json_encode($medias, true); ?>;
-	console.log(medias);
+	var media_path = '<?= $media_path; ?>';
 </script>
 <div id="form-container">
-	<div id="media-toolbar-template" class="dontdisplay"><?
-		echo renderMediaToolbar($medias, 'media-toolbar-template');
-	?></div>
 	<div class="form">
 		<script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
 		<?php
@@ -198,11 +209,11 @@ if ($rr->action != "update" && $current_item['id'])
 			<div class="field-name"><? echo $displayName; ?></div>
 			<div class="field-body">
 			<? if($fieldType == "wysiwyg") { ?>
-                <textarea name='<? echo $var; ?>' class='large dontdisplay' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
+                <textarea name='<? echo $var; ?>' class='large dontdisplay wysiwyg-field' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
                     if($current_item[$var])
                         echo htmlentities($current_item[$var]);
                 ?></textarea>
-                <? if(!empty($current_item[$var])){
+                <? if($current_item[$var] && !empty(trimBreaksFromSides($current_item[$var]))){
                 	$body = trim($current_item[$var]);
                 	$body = str_replace("\r", '', $body);
                 	$body = str_replace("\n", '', $body);
@@ -221,13 +232,13 @@ if ($rr->action != "update" && $current_item['id'])
                     				$thisContent = trimBreaksFromSides($match[2]);
                     				if($thisType == 'figure')
                     				{
-                						$field_html .= '<div class="wysiwyg-section">' . renderWysiwygFigure($var, $thisContent, $medias) . '</div>';
-                						$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                						$field_html .= '<div class="wysiwyg-section"><div class="btn-remove-wysiwyg-section" onclick="removeWysiwygSection(this);">&times;</div><div class="msg-container msg-container-remove"><span class="msg">Remove this block</span></div>' . renderWysiwygFigure($var, $thisContent, $medias) . '</div>';
+                						$field_html .= '<div class="wysiwyg-section add-parent">' .renderWysiwygAdd($var) . '</div>';
                     				}
                     				else if($thisType == 'p' && !empty($thisContent))
                     				{
-                    					$field_html .= '<div class="wysiwyg-section">' . renderWysiwygText($var, $thisContent) . '</div>';
-                    					$field_html .= '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                    					$field_html .= '<div class="wysiwyg-section"><div class="btn-remove-wysiwyg-section" onclick="removeWysiwygSection(this);">&times;</div><div class="msg-container msg-container-remove"><span class="msg">Remove this block</span></div>' . renderWysiwygText($var, $thisContent) . '</div>';
+                    					$field_html .= '<div class="wysiwyg-section add-parent">' .renderWysiwygAdd($var) . '</div>';
                     				}
                     			}
                 			}                        			
@@ -240,25 +251,25 @@ if ($rr->action != "update" && $current_item['id'])
                 else
                 	echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
                         
-                ?>
-
-				<script>
-					<? 
-					if($user == 'admin' && $default_editor_mode == 'html') { ?>
-						sethtml('<? echo $var; ?>', default_editor_mode);
-					<? } ?>
-				</script>
-				<?
 				// ** end minimal wysiwig toolbar **
 				}
 				else if($fieldType == "image")
 				{
-					// var_dump($current_item[$var]);
-					echo renderImageBlock($var, $current_item[$var], $fieldSlug, $medias);
+					?><input name="<?= $var; ?>" type="hidden" form="edit-form"><?
+					echo renderImageBlock($var, $current_item[$var], $fieldSlug . ' image-field', $medias, array('fieldname' => $var));
 				}
 				else if($fieldType == "checkbox")
 				{
+					$options = $checkbox_options[$fieldSlug];
+					$value = empty($current_item[$var]) ? '' : trim($current_item[$var]);
+					$saved = $value ? explode(',', $value) : array();
 
+					foreach($options as $option)
+					{
+						$checked = (empty($saved) && $option['checked']) || in_array($option['slug'], $saved);
+						$this_id = $var . '-' .$option['slug'];
+						?><input id="<?= $this_id; ?>" name="<?= $var; ?>[]" type="checkbox" form="edit-form" required value="<?= $option['slug']; ?>" <?= $checked ? 'checked' : ''; ?>><label for="<?= $this_id; ?>"><?= $option['displayName']; ?></label><?
+					}
 				?><?
 				}
 				else if($fieldType == "select")
@@ -289,7 +300,6 @@ if ($rr->action != "update" && $current_item['id'])
 			temp.addEventListener('click', function(){
 				iframe.postMessage(toid, location.origin);
 			});
-			// console.log(medias);
 			window.addEventListener("message", (event) => {
 				console.log(event.data);
 				let response = JSON.parse(event.data);
@@ -311,19 +321,14 @@ if ($rr->action != "update" && $current_item['id'])
 				type='button'
 				name='cancel'
 				value='Cancel'
+				class='btn on-grey'
 				onClick="<? echo $js_back; ?>"
 				form="edit-form"
 			>
-			<input
-				type='submit'
-				name='submit'
-				value='Update Object'
-				onclick='commitAll();'
-				form="edit-form"
-				<?php if ($user == 'guest'): ?>
-					disabled = "disabled"
-				<?php endif; ?>
-			>
+			<button
+				onclick='editSubmit();'
+				class='btn on-grey'
+			>Update Object</button>
 		</div>
 	</div>
 	<!-- </form> -->
@@ -337,65 +342,35 @@ if ($rr->action != "update" && $current_item['id'])
 </div>
 <?php
 }
-// THIS CODE NEEDS TO BE FACTORED OUT SO HARD
-// basically the same as what is happening in add.php
 else
 {
 	$new = array();
 	// objects
 	foreach($vars as $var)
 	{
-		$new[$var] = addslashes($rr->$var);
+		if(is_array($rr->$var))
+		{
+			if(empty($rr->$var))
+				$rr->$var = '';
+			else
+			{
+				if($current_fields[$var]['type'] == 'checkbox')
+					$rr->$var = implode(',', $rr->$var);
+			}
+		}
+		
+		if(!empty($rr->$var))
+			$new[$var] = addslashes($rr->$var);
+		else
+			$new[$var] = $rr->$var;
+		
 		if(isset($current_item[$var]))
 			$current_item[$var] = addslashes($current_item[$var]);
 		else
 			$current_item[$var] = '';
 	}
-	$siblings = $oo->siblings($uu->id);
-	$updated = update_object($item, $new, $siblings, $vars);
-
-	// process new media
-	$updated = (process_media($uu->id) || $updated);
-
-	// delete media
-	// check to see if $rr->deletes exists (isset)
-	// because if checkbox is unchecked that variable "doesn't exist"
-	// although the expected behaviour is for it to exist but be null.
-	if(isset($rr->deletes))
-	{
-		foreach($rr->deletes as $key => $value)
-		{
-			$m = $rr->medias[$key];
-			$mm->deactivate($m);
-			$updated = true;
-		}
-	}
-
-	// update caption, weight, rank
-    if (is_array($rr->captions)) {
-	    $num_captions = sizeof($rr->captions);
-	    if (sizeof($rr->medias) < $num_captions)
-		    $num_captions = sizeof($rr->medias);
-		for ($i = 0; $i < $num_captions; $i++)
-		{
-			unset($m_arr);
-			$m_id = $rr->medias[$i];
-			$caption = addslashes($rr->captions[$i]);
-			$rank = addslashes($rr->ranks[$i]);
-
-			$m = $mm->get($m_id);
-			if($m["caption"] != $caption)
-				$m_arr["caption"] = "'".$caption."'";
-			if($m["rank"] != $rank)
-				$m_arr["rank"] = "'".$rank."'";
-
-			if(isset($m_arr))
-			{
-				$arr["modified"] = "'".date("Y-m-d H:i:s")."'";
-				$updated = $mm->update($m_id, $m_arr);
-			}
-		}
-    }
+	$siblings = $oo->siblings($current_item['id']);
+	$updated = update_object($current_item, $new, $siblings, $vars);
 
 	?><div class="self-container"><?
 		// should change this url to reflect updated url
@@ -406,7 +381,6 @@ else
 			$url.= $u."/";
 		$url.= $new['url'];
 		?><p><a href="<? echo $url; ?>"><?php echo $new['name1']; ?></a></p><?
-	// Job well done?
 	if($updated)
 	{
 	?><p>Record successfully updated.</p><?
@@ -429,6 +403,7 @@ else
 /*		padding:20px;*/
 		background-color:#dedede;
 /*		margin-bottom:5px;*/
+position: relative;
 	}
 	.wysiwyg-edit-img
 	{
@@ -499,7 +474,46 @@ else
 	{
 		display: block;
 	}
-	.wysiwyg-add-toggle,
+	.wysiwyg-add-toggle{
+		padding: 5px;
+		width: calc(100% + 20px);
+		position: relative;
+		padding-right: 25px;
+		color: transparent;
+	}
+	.wysiwyg-add-toggle:after
+	{
+		content: '+';
+		font-size: 20px;
+		text-align: right;
+		position: absolute;
+		right: 0;
+		top: 0;
+		color: #000;
+		border: 2px solid #000;
+		width: 30px;
+		height: 100%;
+/*		border-left: none;*/
+		padding: 3px 5px 0 0;
+		box-sizing: border-box;
+		padding-top: 3px;
+		border-top-left-radius: 50%;
+		border-bottom-left-radius: 50%;
+	}
+	.wysiwyg-add-toggle:hover,
+	.viewing-sectionOptions .wysiwyg-add-toggle
+	{
+		color: #fff;
+		background-color:#000;
+	}
+	.viewing-sectionOptions .wysiwyg-add-toggle:after
+	{
+		display: none;
+	}
+	.wysiwyg-add-toggle:hover:after
+	{
+		color: #fff;
+	}
 	.section-option
 	{
 		padding: 5px;
@@ -527,6 +541,7 @@ else
 	{
 		opacity: 1;
 		pointer-events: auto;
+		transition: opacity .35s;
 	}
 	#media-upload-container
 	{
@@ -535,7 +550,6 @@ else
 		left: 50%;
 		width: 500px;
 		height: 90vh;
-		transition: opacity .35s;
 		top: 50%;
 		transform: translate(-50%, -50%);
 		pointer-events: none;
@@ -574,25 +588,114 @@ else
 	}
 	.media-toolbar-toggle:after
 	{
-		content: "Choose uploaded image";
+		/*content: "Choose uploaded image";
 		display: block;
 		text-align: center;
 		padding: 5px;
 		cursor:pointer;
 		font-size: 12px;
+		background-color: #000;
+		color: #fff;*/
+	}
+	.image-container
+	{
+		position: relative;
+		cursor: pointer;
+	}
+	.msg-container
+	{
+		display: none;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		
+		top:0;
+		left:0;
+		pointer-events: none;
+		box-sizing: border-box;
+		text-align: center;
+		
+	}
+	.image-container > .msg-container
+	{
+		background-color: rgba(0, 0, 255, 0.75);
+		color: #fff;
+	}
+	.msg-container.msg-container-remove
+	{
+		background-color: rgba(255, 0, 0, 0.75);
+		color: #fff;
+	}
+	.msg-container > .msg
+	{
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.image-container:hover .msg-container
+	{
+		display: block;
+	}
+	.image-container.viewing-toolbar:hover .msg-container
+	{
+		display: none;
 	}
 	.media-toolbar-toggle:hover:after
 	{
-		background-color: #fff;
+		/*background-color: #fff;
+		color: #000;*/
 	}
 	.viewing-toolbar .media-toolbar-toggle:after
 	{
-		content: "\0000D7";
-		font-size: 16px;
+		content: "close";
+/*		font-size: 16px;*/
+		padding: 5px;
+		cursor:pointer;
 		background-color: #fff;
+		display: block;
+		text-align: center;
+	}
+	.viewing-toolbar .media-toolbar-toggle:hover:after
+	{
+		background-color: #00f;
+		color: #fff;
 	}
 	img[src="null"]
 	{
 		display: none;
 	}
+	.btn-remove-wysiwyg-section
+	{
+		position: absolute;
+		right: 0px;
+		transform: translate(100%, 0);
+		padding: 2px 5px;
+/*		font-size: 12px;*/
+		display: none;
+/*		padding:;*/
+		font-size: 20px;
+		color: #f00;
+		cursor: pointer;
+		border: 2px solid #f00;
+		border-left: none;
+	}
+	.wysiwyg-section:hover .btn-remove-wysiwyg-section
+	{
+		display: block;
+	}
+	.btn-remove-wysiwyg-section:hover
+	{
+		background-color: #f00;
+		color: #fff;
+	}
+	.msg-container-remove
+	{
+		z-index:10;
+	}
+	.btn-remove-wysiwyg-section:hover + .msg-container-remove
+	{
+		display: block;
+	}
+
 </style>

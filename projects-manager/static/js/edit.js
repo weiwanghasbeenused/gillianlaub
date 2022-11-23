@@ -187,7 +187,7 @@ function updateMediaToolbar(media_arr = false)
 			let html = '';
 			for(idx in media_arr)
 			{
-				html += '<div class="toolbar-image-container"><img onclick="useThisImage(this);" src="'+media_arr[idx].file+'"></div>';
+				html += '<div class="toolbar-image-container"><img onclick="useThisImage(this);" src="'+media_arr[idx].file+'" filename="'+media_arr[idx].filename+'"></div>';
 			}
 			[].forEach.call(sMediaToolbars, function(el, i){
 				el.innerHTML = html;
@@ -203,15 +203,17 @@ function toggleSectionOptions(target)
 function useThisImage(target)
 {
 	let src = target.src;
+	let filename = target.getAttribute('filename');
+	// console.log('target.src = ' + target.src);
 	let wrapper = target.parentNode.parentNode.parentNode;
 	let img = wrapper.querySelector('.display-image');
 	if(img){
 		img.src = src;
+		img.setAttribute('filename', filename);;
 	}
 	else
 		console.log('missing .display-image');
 	wrapper.classList.remove('viewing-toolbar');
-	
 }
 
 function reqeustEditFunctions(functionName, param = '', onComplete){
@@ -252,10 +254,8 @@ function addSectionHere(target, name, type){
 	else if(type == 'image')
 	{
 		functionName = 'renderWysiwygFigure';
-		params = '{ "var":"' + name + '", "content": ""}';
-		// postParams = 'function=' + functionName + '&params=' + functionParams;
+		params = '{ "var":"' + name + '", "content": "", "media": "'+JSON.stringify(medias).replace(/"/g, '\\"')+'", "imageBlockClass": "viewing-toolbar"}';
 	}
-
 	var requestedElementHTML = false;
 	var addSectionHTML = false;
 
@@ -266,16 +266,15 @@ function addSectionHere(target, name, type){
 			addSectionHTML = html;
 		if(requestedElementHTML && addSectionHTML)
 		{
-
-			let temp = document.createElement('DIV');
-			temp.className = 'wysiwyg-section';
-			temp.innerHTML = addSectionHTML;
-			thisWysiwygSection.innerHTML = requestedElementHTML;
-			thisWysiwygSection.parentNode.insertBefore(temp.cloneNode(true), thisWysiwygSection);
-			if(thisWysiwygSection.nextSibling)
-				thisWysiwygSection.parentNode.insertBefore(temp.cloneNode(true), thisWysiwygSection.nextSibling);
-			else
-				thisWysiwygSection.parentNode.appendChild(temp.cloneNode(true));
+			let add = document.createElement('DIV');
+			add.className = 'wysiwyg-section add-parent';
+			add.innerHTML = addSectionHTML;
+			thisWysiwygSection.parentNode.insertBefore(add.cloneNode(true), thisWysiwygSection);
+			let wysiwyg = document.createElement('DIV');
+			wysiwyg.className = 'wysiwyg-section';
+			wysiwyg.innerHTML = requestedElementHTML;
+			thisWysiwygSection.parentNode.insertBefore(wysiwyg.cloneNode(true), thisWysiwygSection);
+			toggleSectionOptions(target)
 		}
 	}
 
@@ -358,4 +357,75 @@ function closeMediaContainer(){
 	document.body.classList.remove('viewing-popup-window');
 	let iframe = document.querySelector('#media-upload-container iframe');
 	iframe.src = iframe.src;
+}
+function encodeWysiwygFigure(editContainer){
+	let output = '';
+	let img = editContainer.querySelector('img.display-image');
+	let filename = img.getAttribute('filename');	
+	if(filename != 'null')
+	{
+		let src = img.src;
+		output = '[wysiwygsection wysiwygtag="figure"]';
+		let caption = editContainer.querySelector('textarea.wysiwyg-edit-figcaption').value;
+		output += '<img class="wysiwygimg" src="'+src+'" filename="'+filename+'">';
+		if(caption !== '')
+			output += '<figcaption class="wysiwygfigcaption">'+caption+'</figcaption>';
+		output += '[/wysiwygsection]';
+	}
+	return output;
+}
+
+function encodeWysiwygP(editContainer){
+	let output = '';
+	if(editContainer.value !== '');
+		output = '[wysiwygsection wysiwygtag="p"]' + editContainer.value + '[/wysiwygsection]';
+	return output;
+}
+function compileWysiwygField(field){
+	let output = '';
+	let name = field.getAttribute('name');
+	let this_editContainers = document.querySelectorAll('.wysiwyg-edit-container[fieldname="'+name+'"]');
+	[].forEach.call(this_editContainers, function(el){
+		let thisType = el.getAttribute('type');
+		if(thisType == 'figure')
+			output += encodeWysiwygFigure(el);
+		else if(thisType == 'p')
+			output += encodeWysiwygP(el);
+	});
+
+	return output;
+}
+
+function editSubmit(){
+	let sWysiwyg_field = document.getElementsByClassName('wysiwyg-field');
+	if(sWysiwyg_field.length != 0)
+	{
+		[].forEach.call(sWysiwyg_field, function(el){
+			let updateValue = compileWysiwygField(el);
+			el.value = updateValue;
+		});
+	}
+	let sImage_field = document.getElementsByClassName('image-field');
+	if(sImage_field.length != 0)
+	{
+		[].forEach.call(sImage_field, function(el){
+			let name = el.getAttribute('fieldname');
+			let filename = el.querySelector('.display-image').getAttribute('filename');
+			document.querySelector('input[name='+name+']').value = filename;
+		});
+	}
+	let sCheckbox_field = document.getElementsByClassName('checkbox-field');
+	
+	let form = document.getElementById('edit-form');
+	form.submit();
+}
+
+function removeWysiwygSection(target)
+{
+	let section = target.parentNode;
+	while(!section.classList.contains('wysiwyg-section') && section != document.body)
+		section = section.parentNode;
+	if(section.previousElementSibling && section.previousElementSibling != section.parentNode.firstChild && section.previousElementSibling.classList.contains('add-parent'))
+		section.parentNode.removeChild(section.previousElementSibling);
+	section.parentNode.removeChild(section);
 }
