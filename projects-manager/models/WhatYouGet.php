@@ -41,8 +41,10 @@ class WhatYouGet extends WhatYouSeeIsWhatYouGet{
 		$img_class = 'gallery-image';
 		preg_match($this->patterns['img'], $input, $img_match);
 		if(!empty($img_match)){
-			$filename = $img_match[1];
-			$src = $this->media_root . $filename;
+			$src = $img_match[1];
+			// $src = $this->media_root . $src;
+			// $src = $src;
+			var_dump($src);
 			$size = getimagesize(substr($src, 1));
 			if($size[0] > $size[1])
 				$img_class .= ' landscape';

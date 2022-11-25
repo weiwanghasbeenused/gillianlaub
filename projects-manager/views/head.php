@@ -102,6 +102,49 @@ if(file_exists($settings_file))
 if ($view == "logout")
 	header("HTTP/1.1 401 Unauthorized");
 
+$section = isset($_GET['section']) ? $_GET['section'] : '';
+if(empty($section)){
+	$current_item = $item;
+}
+else
+{
+	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $section));
+	$current_item = $oo->get(end($temp));
+}
+$id = empty($current_item) ? false : $current_item['id'];
+$url = empty($current_item) ? false : $current_item['url'];
+
+$general_urls = array(
+	'delete' => '',
+	'edit' => '',
+	'browse' => '',
+	'add' => ''
+);
+if( count($uri) > 2)
+{
+	$uri_copy = $uri;
+	foreach($general_urls as $key => &$u)
+	{
+		$uri_copy[2] = $key;
+		$u = $delete_url = implode('/', $uri_copy);
+		if($key != 'add' && !empty($section)) $u .= '?section=' . $section;
+	}
+}
+
+$general_urls['logout'] = $admin_path . 'logout';
+$general_urls['generate'] = $host . implode("/", $uu->urls);
+
+$path = array();
+if(isset($uri[3]))
+{
+	$path[] = '<a href="/projects-manager/browse/'.$uri[3].'">' . strtoupper($uri[3]) . '</a>';
+	if(isset($uri[4]))
+	{
+		$path[] = $item['name1'];
+		if(!empty($section))
+			$path[] = $current_item['name1'];		
+	}
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -113,12 +156,14 @@ if ($view == "logout")
 		<link rel="shortcut icon" href="<? echo $admin_path;?>media/icon.png">
 		<link rel="apple-touch-icon-precomposed" href="<? echo $admin_path;?>media/icon.png">
 		<link rel="stylesheet" href="<? echo $admin_path; ?>static/css/main.css">
+		<link rel="stylesheet" href="<? echo $admin_path; ?>static/css/form.css">
 	</head>
 	<body>
 		<div class="popup-window-mask full-width full-height"></div>
 		<div id="page">
 			<header class="centre">
 				<div id="nav">
-					<a href="<?php echo $admin_path; ?>browse">Projects Manager</a>
+					<div id="title"><a href="<?php echo $admin_path; ?>browse">Projects Manager</a></div>
+					<div id="path"><?= implode(' > ', $path); ?></div>
 				</div>
 			</header>

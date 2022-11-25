@@ -1,0 +1,340 @@
+.wysiwyg-section.msg-container > .msg
+	{
+/*		padding:20px;*/
+		background-color:#dedede;
+/*		margin-bottom:5px;*/
+	position: relative;
+	}
+	.wysiwyg-edit-img
+	{
+		display: block;
+		cursor: pointer;
+	}
+	.wysiwyg-section textarea
+	{
+		background-color: #dedede;
+		cursor:pointer;
+		border:none;
+		resize: vertical;
+		padding: 5px;
+		display: block;
+	}
+	.wysiwyg-section textarea:focus
+	{
+		background-color: #fff;
+		outline:none;
+		cursor:text;
+	}
+
+	.wysiwyg-section textarea.wysiwyg-edit-figcaption
+	{
+		text-align: center;
+		padding-left: 30px;
+		padding-right: 30px;
+		margin-top:px;
+	}
+	
+	.wysiwyg-add-section {
+		cursor: pointer;
+		text-align: center;
+		color: #fff;
+		font-size: 12px;
+	}
+	.wysiwyg-add-toggle:hover,
+	.section-option:hover
+	{
+		background-color: #fff;
+		color: #000;
+	}
+	.wysiwyg-add-section .msg
+	{
+		display: inline-block;
+	}
+	.inline-icon
+	{
+/*		display: inline-block;*/
+		margin-right:5px;
+		font-size: 16px;
+
+	}
+	.toolbar
+	{
+		width: auto;
+	}
+	.msg
+	{
+/*		font-family: ;*/
+	}
+	.add-options-container,
+	.viewing-sectionOptions .add-prompt-container
+	{
+		display: none;
+	}
+	.viewing-sectionOptions .add-options-container
+	{
+		display: block;
+	}
+	.wysiwyg-add-toggle{
+		padding: 5px;
+		width: calc(100% + 25px);
+		position: relative;
+		padding-right: 25px;
+		color: transparent;
+	}
+	.wysiwyg-add-toggle > .icon
+	{
+		font-size: 16px;
+		text-align: right;
+		position: absolute;
+		right: 0;
+		top: 0;
+		color: #000;
+		border: 2px solid #000;
+		width: 30px;
+		height: 100%;
+		padding: 3px 8px 0 0;
+		box-sizing: border-box;
+		padding-top: 3px;
+		border-left: none;
+		background-color: #dedede;
+/*		border-top-left-radius: 50%;*/
+/*		border-bottom-left-radius: 50%;*/
+	}
+	.wysiwyg-add-toggle > .icon:after
+	{
+		position: absolute;
+	}
+	.wysiwyg-add-toggle:hover,
+	.viewing-sectionOptions .wysiwyg-add-toggle
+	{
+		color: #fff;
+		background-color:#000;
+	}
+	.viewing-sectionOptions .wysiwyg-add-toggle > .icon
+	{
+		display: none;
+	}
+	.wysiwyg-add-toggle:hover > .icon
+	{
+		color: #fff;
+		background-color: #000;
+	}
+	.section-option
+	{
+		padding: 5px;
+		background-color:#000;
+	}
+	.section-option
+	{
+		margin-top:2px;
+	}
+	/*.preview-cell:hover .preview-removethisbtn:hover
+	{
+		background-color: #000;
+		color: #fff;
+	}
+	.preview-removethisbtn:hover + .preview-msg .preview-filename
+	{
+		display: none;
+	}
+	.preview-removethisbtn:hover + .preview-msg:after
+	{
+		content: 'remove this image';
+		display: block;
+	}*/
+	.viewing-media-upload #media-upload-container
+	{
+		opacity: 1;
+		pointer-events: auto;
+		transition: opacity .35s;
+	}
+	#media-upload-container
+	{
+		position: fixed;
+		opacity: 0;
+		left: 50%;
+		width: 500px;
+		height: 90vh;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		pointer-events: none;
+		background-color: #fff;
+		z-index: 500;
+		box-shadow: 5px 5px 12px #000;
+		background-color: #dedede;
+	}
+	#media-upload-container iframe
+	{
+		border: none;
+		width: 100%;
+		height: 100%;
+	}
+	#btn-closeMediaContainer
+	{
+		font-size: 20px;
+		position: absolute;
+		padding: 11px 15px;
+		left: 10px;
+		top: 10px;
+		cursor: pointer;
+	}
+	#btn-closeMediaContainer:hover
+	{
+		background-color: #000;
+		color: #fff;
+	}
+	.empty-msg
+	{
+		display: none;
+	}
+	.media-toolbar.empty .empty-msg
+	{
+		display: block;
+	}
+	.media-toolbar-toggle:after
+	{
+		/*content: "Choose uploaded image";
+		display: block;
+		text-align: center;
+		padding: 5px;
+		cursor:pointer;
+		font-size: 12px;
+		background-color: #000;
+		color: #fff;*/
+	}
+	.image-container
+	{
+		position: relative;
+		cursor: pointer;
+	}
+	.msg-container
+	{
+		display: none;
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		
+		top:0;
+		left:0;
+		pointer-events: none;
+		box-sizing: border-box;
+		text-align: center;
+		
+	}
+	.image-container > .msg-container
+	{
+		background-color: rgba(0, 0, 255, 0.75);
+		color: #fff;
+	}
+	.msg-container.msg-container-remove
+	{
+		background-color: rgba(255, 0, 0, 0.75);
+		color: #fff;
+	}
+	.msg-container > .msg
+	{
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.image-container .msg:after
+	{
+		content: "Relace this image";
+		display: block;
+	}
+	.image-container > .media-toolbar.empty ~ .msg-container
+	{
+		display: block;
+		position: relative;
+	}
+	.image-container > .media-toolbar.empty ~ .msg-container > .msg
+	{
+		/*position: static;
+		transform: none;*/
+	}
+	.image-container > .media-toolbar.empty ~ .msg-container > .msg:after
+	{
+		content: "Please upload media first";
+	}
+	.image-container:hover .msg-container
+	{
+		display: block;
+	}
+	.image-container.viewing-toolbar:hover .msg-container
+	{
+		display: none;
+	}
+	.media-toolbar-toggle:hover:after
+	{
+		/*background-color: #fff;
+		color: #000;*/
+	}
+	.viewing-toolbar .media-toolbar-toggle:after
+	{
+		content: "close";
+/*		font-size: 16px;*/
+		padding: 5px;
+		cursor:pointer;
+		background-color: #fff;
+		display: block;
+		text-align: center;
+	}
+	.viewing-toolbar .media-toolbar-toggle:hover:after
+	{
+		background-color: #00f;
+		color: #fff;
+	}
+	img[src="null"]
+	{
+		display: none;
+	}
+	.btn-remove-wysiwyg-section
+	{
+		position: absolute;
+		right: 0px;
+		transform: translate(100%, 0);
+		padding: 2px 5px;
+/*		font-size: 12px;*/
+		display: none;
+/*		padding:;*/
+		font-size: 20px;
+		color: #f00;
+		cursor: pointer;
+		border: 2px solid #f00;
+		border-left: none;
+	}
+	.wysiwyg-section:hover .btn-remove-wysiwyg-section
+	{
+		display: block;
+	}
+	.btn-remove-wysiwyg-section:hover
+	{
+		background-color: #f00;
+		color: #fff;
+	}
+	.msg-container-remove
+	{
+		z-index:10;
+	}
+	.btn-remove-wysiwyg-section:hover + .msg-container-remove
+	{
+		display: block;
+	}
+	.order-item
+	{
+		padding: 5px;
+	}
+	.order-control
+	{
+		float: right;
+	}
+	.order-item:hover
+	{
+		background-color: #000;
+		color: #fff;
+	}
+	.order-item + .order-item
+	{
+		border-top: 2px solid #000;
+	}

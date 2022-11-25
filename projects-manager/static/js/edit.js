@@ -171,7 +171,7 @@ function reset(name){
     document.execCommand('removeFormat',false,'');
 }
 
-function displayMediaToolbar(target, media_arr = false)
+function displayMediaToolbar(target)
 {
 	let thisWrapper = target.parentNode;
 	while(!thisWrapper.classList.contains('image-container') && thisWrapper != document.body)
@@ -187,7 +187,7 @@ function updateMediaToolbar(media_arr = false)
 			let html = '';
 			for(idx in media_arr)
 			{
-				html += '<div class="toolbar-image-container"><img onclick="useThisImage(this);" src="'+media_arr[idx].file+'" filename="'+media_arr[idx].filename+'"></div>';
+				html += '<div class="toolbar-image-container"><img onclick="useThisImage(this);" src="'+media_arr[idx].file+'"></div>';
 			}
 			[].forEach.call(sMediaToolbars, function(el, i){
 				el.innerHTML = html;
@@ -202,31 +202,28 @@ function toggleSectionOptions(target)
 
 function useThisImage(target)
 {
-	let src = target.src;
-	let filename = target.getAttribute('filename');
-	// console.log('target.src = ' + target.src);
+	let src = target.getAttribute('src');
 	let wrapper = target.parentNode.parentNode.parentNode;
 	let img = wrapper.querySelector('.display-image');
-	if(img){
+	if(img)
 		img.src = src;
-		img.setAttribute('filename', filename);;
-	}
 	else
 		console.log('missing .display-image');
 	wrapper.classList.remove('viewing-toolbar');
 }
 
-function reqeustEditFunctions(functionName, param = '', onComplete){
-	let request_url = '/projects-manager/static/php/editFunctions_ajax.php';
+function reqeustWhatYouSeeFunctions(functionName, media=[], param = '', onComplete){
+	let request_url = '/projects-manager/static/php/WhatYouSeeController.php';
 	let request = new XMLHttpRequest();
-	let postParams = 'function=' + functionName + '&params=' + param;
+	media = JSON.stringify(media);
+	media = media.replace(/"/g, '\\"');
+	let postParams = 'function=' + functionName + '&media='+media+'&params=' + param;
 	request.onreadystatechange = function() {
         if (this.readyState == 4) {
         	if(this.status == 200)
         	{
         		var response = this.responseText;
-        		var isAddSection = functionName == 'renderWysiwygAdd';
-            	onComplete(response, isAddSection);
+            	onComplete(response);
         	}
         }
     };
@@ -235,52 +232,86 @@ function reqeustEditFunctions(functionName, param = '', onComplete){
     request.send(postParams);
 }
 
-function addSectionHere(target, name, type){
-	let functionName = '';
+function addSectionHere(target, name, type, media){
 	let params = '';
-	let postParams = '';
+	let extraParams = '';
 	var thisWysiwygSection = target.parentNode;
 	while( !thisWysiwygSection.classList.contains('wysiwyg-section') && thisWysiwygSection != document.body)
 	{
 		thisWysiwygSection = thisWysiwygSection.parentNode;
 	}
-    
-	if(type == 'text')
+    console.log('type = ' + type);
+	if(type == 'text' || type == 'p')
 	{
-		functionName = 'renderWysiwygText';
-		params = '{ "var":"' + name + '", "content": "", "acceptEmptyContent": true }';
-		
+		let existingElement = document.querySelector('.wysiwyg-edit-p');
+		if(existingElement)
+		{	
+			toggleSectionOptions(target);
+			let parent = existingElement.parentNode.cloneNode(true);
+			let temp = parent.querySelector('.wysiwyg-edit-p');
+			temp.setAttribute('fieldname', name);
+			temp.value = '';
+			if(thisWysiwygSection.nextElementSibling)
+			{
+				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
+				thisWysiwygSection.parentNode.insertBefore(thisWysiwygSection.cloneNode(true), thisWysiwygSection.nextElementSibling);
+			}
+			else
+			{
+				thisWysiwygSection.parentNode.appendChild(parent);
+				thisWysiwygSection.parentNode.appendChild(thisWysiwygSection.cloneNode(true));
+			}
+			return;
+		}
+		extraParams = '{"acceptEmptyContent": true}';
+		extraParams = extraParams.replace(/"/g, '\\"');
+		params = '{ "type": "text", "var":"' + name + '", "content": "", "params": "'+extraParams+'" }';
+		params = params.replace(/"/g, '\\"');
 	}
 	else if(type == 'image')
 	{
-		functionName = 'renderWysiwygFigure';
-		params = '{ "var":"' + name + '", "content": "", "media": "'+JSON.stringify(medias).replace(/"/g, '\\"')+'", "imageBlockClass": "viewing-toolbar"}';
-	}
-	var requestedElementHTML = false;
-	var addSectionHTML = false;
-
-	function postRequest(html, isAddSection = false){
-		if(!isAddSection)
-			requestedElementHTML = html;
-		else
-			addSectionHTML = html;
-		if(requestedElementHTML && addSectionHTML)
+		let existingElement = document.querySelector('.wysiwyg-edit-figure');
+		if(existingElement)
 		{
-			let add = document.createElement('DIV');
-			add.className = 'wysiwyg-section add-parent';
-			add.innerHTML = addSectionHTML;
-			thisWysiwygSection.parentNode.insertBefore(add.cloneNode(true), thisWysiwygSection);
-			let wysiwyg = document.createElement('DIV');
-			wysiwyg.className = 'wysiwyg-section';
-			wysiwyg.innerHTML = requestedElementHTML;
-			thisWysiwygSection.parentNode.insertBefore(wysiwyg.cloneNode(true), thisWysiwygSection);
-			toggleSectionOptions(target)
+			toggleSectionOptions(target);
+			let parent = existingElement.parentNode.cloneNode(true);
+			let temp = parent.querySelector('.wysiwyg-edit-figure');
+			temp.setAttribute('fieldname', name);
+			temp.querySelector('.wysiwyg-edit-figcaption').value = '';
+			temp.querySelector('.display-image').src = 'null';
+			if(thisWysiwygSection.nextElementSibling)
+			{
+				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
+				thisWysiwygSection.parentNode.insertBefore(thisWysiwygSection.cloneNode(true), thisWysiwygSection.nextElementSibling);
+			}
+			else
+			{
+				thisWysiwygSection.parentNode.appendChild(parent);
+				thisWysiwygSection.parentNode.appendChild(thisWysiwygSection.cloneNode(true));
+			}
+			return;
 		}
+		extraParams = '{"imageBlockClass": "viewing-toolbar"}';
+		extraParams = extraParams.replace(/"/g, '\\"');
+		params = '{ "type": "figure", "var":"' + name + '", "content": "null", "params": "'+extraParams+'"}';
+		params = params.replace(/"/g, '\\"');
 	}
 
-
-	reqeustEditFunctions(functionName, params, postRequest);
-	reqeustEditFunctions('renderWysiwygAdd', '{ "var":"' + name + '" }', postRequest);
+	function postRequest(html){
+		let temp = document.createElement('DIV');
+		temp.innerHTML = html;
+		if(thisWysiwygSection.nextElementSibling)
+		{
+			while(temp.firstChild)
+				thisWysiwygSection.parentNode.insertBefore(temp.firstChild, thisWysiwygSection.nextElementSibling);
+		}
+		else
+			while(temp.firstChild)
+				thisWysiwygSection.parentNode.appendChild(temp.firstChild);
+		
+		toggleSectionOptions(target);
+	}
+	reqeustWhatYouSeeFunctions('render', media, params, postRequest);
 }
 
 function renderPreviewCell(imgs, filenames){
@@ -290,7 +321,6 @@ function renderPreviewCell(imgs, filenames){
 	[].forEach.call(imgs, function(el, i){
 		let thisCell = document.createElement('DIV');
 		thisCell.className = 'preview-cell';
-		// thisCell.innerHTML = '<div class="preview-removethisbtn icon-cross" onclick="removePreviewCell(this, '+i+');">&times;</div><div class="preview-msg"><div class="preview-filename">'+filenames[i]+'</div></div>';
 		thisCell.innerHTML = '<div class="preview-msg"><div class="preview-filename">'+filenames[i]+'</div></div>';
 		thisCell.appendChild(el);
 		container.appendChild(thisCell);
@@ -361,17 +391,17 @@ function closeMediaContainer(){
 function encodeWysiwygFigure(editContainer){
 	let output = '';
 	let img = editContainer.querySelector('img.display-image');
-	let filename = img.getAttribute('filename');	
-	if(filename != 'null')
+	let src = img.src;
+	if(src != 'null')
 	{
-		let src = img.src;
 		output = '[wysiwygsection wysiwygtag="figure"]';
 		let caption = editContainer.querySelector('textarea.wysiwyg-edit-figcaption').value;
-		output += '<img class="wysiwygimg" src="'+src+'" filename="'+filename+'">';
+		output += '<img class="wysiwygimg" src="'+src+'">';
 		if(caption !== '')
 			output += '<figcaption class="wysiwygfigcaption">'+caption+'</figcaption>';
 		output += '[/wysiwygsection]';
 	}
+	
 	return output;
 }
 
@@ -410,11 +440,21 @@ function editSubmit(){
 	{
 		[].forEach.call(sImage_field, function(el){
 			let name = el.getAttribute('fieldname');
-			let filename = el.querySelector('.display-image').getAttribute('filename');
-			document.querySelector('input[name='+name+']').value = filename;
+			let src = el.querySelector('.display-image').getAttribute('src');
+			document.querySelector('input[name='+name+']').value = src;
 		});
 	}
 	let sCheckbox_field = document.getElementsByClassName('checkbox-field');
+	let sOrder_select = document.getElementsByClassName('order-select');
+	if(sOrder_select.length != 0)
+	{
+		let temp = [];
+		[].forEach.call(sOrder_select, function(el){
+			temp.push('{ "id": "'+el.getAttribute('section')+'", "rank":"' +el.value+'"}');
+		});
+		temp = '[' + temp.join(',') + ']';
+		document.querySelector('input[name="section-order"]').value = temp;
+	}
 	
 	let form = document.getElementById('edit-form');
 	form.submit();
@@ -429,3 +469,59 @@ function removeWysiwygSection(target)
 		section.parentNode.removeChild(section.previousElementSibling);
 	section.parentNode.removeChild(section);
 }
+function reorder(select){
+	let currentValue = select.getAttribute('currentValue');
+	let newValue = select.value;
+	let container = select.parentNode;
+	while(!container.classList.contains('order-container') && container != document.body)
+		container = container.parentNode;
+	let selects = container.querySelectorAll('select');
+	let replaceItem = false;
+	let thisItem = false;
+	if(newValue > currentValue)
+	{
+		// -1 for whose value <= newValue && > currentValue
+		[].forEach.call(selects,function(el){
+			if(el.getAttribute('currentValue') == currentValue && !thisItem){
+				thisItem = el;
+				while(!thisItem.classList.contains('order-item') && container != document.body)
+					thisItem = thisItem.parentNode;
+			}
+			else if(el.getAttribute('currentValue') != currentValue && el.value > currentValue && el.value <= newValue){
+				replaceItem = el;
+				el.value = parseInt(el.value) - 1;
+				el.setAttribute('currentValue', el.value);
+			}
+		});
+		while(!replaceItem.classList.contains('order-item') && container != document.body)
+			replaceItem = replaceItem.parentNode;
+		if(replaceItem.nextElementSibling)
+			thisItem.parentNode.insertBefore(thisItem, replaceItem.nextElementSibling);
+		else
+			thisItem.parentNode.appendChild(thisItem);
+	}
+	else if(newValue < currentValue)
+	{	
+		// +1 for whose value >= newValue && < currentValue
+		[].forEach.call(selects,function(el){
+			if(el.getAttribute('currentValue') == currentValue && !thisItem){
+				thisItem = el;
+				while(!thisItem.classList.contains('order-item') && container != document.body)
+					thisItem = thisItem.parentNode;
+			}
+			else if(el.value < currentValue && el.value >= newValue){
+				if(!replaceItem){
+					replaceItem = el;
+					while(!replaceItem.classList.contains('order-item') && container != document.body)
+						replaceItem = replaceItem.parentNode;
+				}
+				el.value = parseInt(el.value) + 1;
+				el.setAttribute('currentValue', el.value);
+			}
+		});
+		thisItem.parentNode.insertBefore(thisItem, replaceItem);
+	}
+	select.setAttribute('currentValue', newValue);
+}
+
+

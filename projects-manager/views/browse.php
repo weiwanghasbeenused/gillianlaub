@@ -3,20 +3,18 @@
 ?>
 
 <div id="body-container">
-	<div id="body">
-		<? require_once('cats.php'); 
-		$children = $Cat->getActiveCatChildren();
-		?>
-		<section id="children-container">
-			<? foreach($children as $key => $child){
-				if(count($children) > 99 )
-					$idx = str_pad($key + 1, 3, 0, STR_PAD_LEFT);
-				else
-					$idx = str_pad($key + 1, 2, 0, STR_PAD_LEFT);
-				?><a class="child" href="<?= $child['editUrl']; ?>"><?= $idx . ' ' . $child['name1']; ?></a><?
-			}; ?>
-		</section>
-	</div>
+	<? require_once('cats.php'); 
+	$children = $Cat->getActiveCatChildren();
+	?>
+	<main id="children-container"><?
+		foreach($children as $key => $child){
+			if(count($children) > 99 )
+				$idx = str_pad($key + 1, 3, 0, STR_PAD_LEFT);
+			else
+				$idx = str_pad($key + 1, 2, 0, STR_PAD_LEFT);
+			?><a class="child" href="<?= $child['editUrl']; ?>"><?= $idx . ' ' . $child['name1']; ?></a><?
+		}; ?>
+	</main>
 </div>
 <script>
 	var sChildren_page = document.getElementsByClassName('children-page');

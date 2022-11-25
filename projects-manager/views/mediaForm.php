@@ -16,7 +16,6 @@ if(empty($_POST) || $_POST['action'] != 'upload') // display form
 	    document.querySelector('input[name="toid"]').value = e.data;
 	},
 	false);
-	// 
 </script>
 <style>
 	header,
@@ -106,8 +105,11 @@ if(empty($_POST) || $_POST['action'] != 'upload') // display form
 		padding-top: 80px;
 	}
 </style>
+</div>
+	</body>
+</html>
 <? 
-	require_once('foot.php');
+	// require_once('foot.php');
 }
 else // respond with uploaded media srcs
 {
@@ -150,8 +152,12 @@ else // respond with uploaded media srcs
 			}
 	    }
 	}
-
-	$message = json_encode($message);
+	$media = $oo->media($toid);
+	foreach($media as &$m)
+	{
+		$m['file'] = '/media/' . m_pad($m['id']) . '.' . $m['type'];
+	}
+	$message = json_encode($media);
 	?>
 	<div id="msg-success">
 		File upload successes!
@@ -174,6 +180,9 @@ else // respond with uploaded media srcs
 			transform: translate(-50%, -50%);
 		}
 	</style>
+	</div>
+	</body>
+</html>
 	<?
-	require_once('foot.php');
+	// require_once('foot.php');
 }

@@ -11,7 +11,9 @@ function removeHiddenChildren($children, $symbol = array('.'))
 	$output = array_values($output);
 	return $output;
 }
-function m_filename_to_url($filename){
-	return '/media/' . $filename;
+function processSrc($input){
+	global $host;
+	// return '/media/' . $filename;
+	return $host . substr($input, 1);
 }
 ?>

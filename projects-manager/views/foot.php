@@ -1,13 +1,16 @@
 <?
-$generate_url = implode("/", $uu->urls);
-$g = $host.$generate_url;
+// $generate_url = implode("/", $uu->urls);
+// $g = $host.$generate_url;
 			?>
 			<footer id="main-footer" class="centre">
-				<a class="btn" href="<? echo $g; ?>" target="_blank">GENERATE</a>
-				<?php if ($user != 'guest'): ?>
-					<a class="btn" href="<? echo $admin_path; ?>settings">SETTINGS</a>
-				<?php endif; ?>
-				<a class="btn" href="<? echo $admin_path; ?>logout" style="float: right;">LOG OUT</a>
+				<? if($uri[2] == 'edit'){
+					?><a class="btn" href="<? echo $general_urls['generate']; ?>" target="_blank">GENERATE</a><?
+					?><a class="btn" href="<? echo $general_urls['delete']; ?>" >DELETE</a><?
+				} else if($uri[2] == 'browse' && count($uri) == 4)
+				{
+					?><a class="btn" href="<? echo $general_urls['add']; ?>">ADD</a><?
+				} ?>				
+				<a class="btn" href="<? echo $general_urls['logout']; ?>" style="float: right;">LOG OUT</a>
 			</footer>
 		</div>
 	</body>

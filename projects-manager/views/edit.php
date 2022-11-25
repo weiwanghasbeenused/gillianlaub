@@ -1,20 +1,14 @@
 <?
 define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/static/php/editFunctions.php');
+require_once(__ROOT__.'/models/WhatYouSee.php');
 
-$current_section = isset($_GET['section']) ? $_GET['section'] : '';
+// $section = isset($_GET['section']) ? $_GET['section'] : '';
 
 $project_item = $item;
 $form_url = $admin_path."edit/".$uu->urls();
-if(empty($current_section))
-	$current_item = $project_item;
-else
-{
-	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $current_section));
-	$current_item = $oo->get(end($temp));
-	$form_url .= '?section=' . $current_section;
-}
-$current_item['name1'];
+if(!empty($section)) $form_url .= '?section=' . $section;
+
 $sections = $oo->children($project_item['id']);
 $nav_items = $sections;
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
@@ -22,14 +16,14 @@ array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
 ?><section id="nav-container"><?
 foreach($nav_items as $n)
 {
-	$isActive = $current_section == $n['url'];
+	$isActive = $section == $n['url'];
 	$class = $isActive ? "nav-item active" : "nav-item inactive";
-	$url = implode('/', $uri);
+	$this_url = implode('/', $uri);
 	if(!empty($n['url']))
-		$url .= '?section=' . $n['url'];
-	?><a class="<?= $class; ?>" href="<?= $url; ?>"><?= $n['name1']; ?></a><?
-}
-?></section><?
+		$this_url .= '?section=' . $n['url'];
+	?><a class="<?= $class; ?>" href="<?= $this_url; ?>"><?= $n['name1']; ?></a><?
+}?><a class="nav-item" href="<?= $general_urls['add']; ?>">&plus;</a>
+</section><?
 
 $browse_url = $admin_path.'browse/'.$uu->urls();
 
@@ -54,6 +48,12 @@ $fields = array(
 			'slug' => 'project-thumbnail',
 			'var' => 'address2',
 			'type' => 'image'
+		),
+		'external' => array(
+			'displayName' => 'Sections',
+			'slug' => 'sections',
+			'var' => 'external',
+			'type' => 'order'
 		),
 	),
 	'section' => array(
@@ -94,7 +94,7 @@ $checkbox_options = array(
 $select_options = array();
 
 $class_prefix = 'gillianlaub';
-$current_fields = empty($current_section) ? $fields['main'] : $fields['section'];
+$current_fields = empty($section) ? $fields['main'] : $fields['section'];
 $wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
 $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 
@@ -162,8 +162,8 @@ function update_object(&$old, &$new, $siblings, $vars)
 	return $updated;
 }
 
-?><div id="body-container">
-	<div><?
+?><main id="body-container">
+	<?
 	$a_url = $admin_path."browse";
 
 if ($rr->action != "update" && $current_item['id'])
@@ -185,8 +185,10 @@ if ($rr->action != "update" && $current_item['id'])
 			$medias[$i]["display"] = $admin_path."media/mp3.png";
 		else
 			$medias[$i]["display"] = $medias[$i]["file"];
-		$medias[$i]["filename"] = m_pad($medias[$i]['id']) . '.' . $medias[$i]['type'];
 	}
+
+	$ws = new WhatYouSee($medias);
+
 // object contents
 ?>
 <script>
@@ -194,7 +196,6 @@ if ($rr->action != "update" && $current_item['id'])
 	var medias = <?= json_encode($medias, true); ?>;
 	var media_path = '<?= $media_path; ?>';
 </script>
-<div id="form-container">
 	<div class="form">
 		<script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
 		<?php
@@ -221,42 +222,37 @@ if ($rr->action != "update" && $current_item['id'])
                 	$field_html = '';
                 	if(!empty($body_arr))
                 	{
-                		foreach($body_arr as $key => $section)
+                		foreach($body_arr as $key => $block_temp)
                 		{
-                			$section = trim($section);
-                			if(!empty($section))
+                			$block_temp = trim($block_temp);
+                			if(!empty($block_temp))
                 			{
-                				preg_match($wysiwyg_section_opening_pattern, $section, $match);
+                				preg_match($wysiwyg_section_opening_pattern, $block_temp, $match);
                     			if(!empty($match) && !empty(trim($match[2]))){
                     				$thisType = $match[1];
-                    				$thisContent = trimBreaksFromSides($match[2]);
-                    				if($thisType == 'figure')
-                    				{
-                						$field_html .= '<div class="wysiwyg-section"><div class="btn-remove-wysiwyg-section" onclick="removeWysiwygSection(this);">&times;</div><div class="msg-container msg-container-remove"><span class="msg">Remove this block</span></div>' . renderWysiwygFigure($var, $thisContent, $medias) . '</div>';
-                						$field_html .= '<div class="wysiwyg-section add-parent">' .renderWysiwygAdd($var) . '</div>';
-                    				}
-                    				else if($thisType == 'p' && !empty($thisContent))
-                    				{
-                    					$field_html .= '<div class="wysiwyg-section"><div class="btn-remove-wysiwyg-section" onclick="removeWysiwygSection(this);">&times;</div><div class="msg-container msg-container-remove"><span class="msg">Remove this block</span></div>' . renderWysiwygText($var, $thisContent) . '</div>';
-                    					$field_html .= '<div class="wysiwyg-section add-parent">' .renderWysiwygAdd($var) . '</div>';
-                    				}
+                    				$thisContent = trimBreaksFromSides($match[2]);             
+                    				echo $ws->render($thisType, $var, $thisContent);
                     			}
                 			}                        			
                 		}
                 		echo $field_html;
                 	}
                 	else
-                		echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                		echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
                 }
                 else
-                	echo '<div class="wysiwyg-section">' .renderWysiwygAdd($var) . '</div>';
+                	echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
                         
 				// ** end minimal wysiwig toolbar **
 				}
 				else if($fieldType == "image")
 				{
 					?><input name="<?= $var; ?>" type="hidden" form="edit-form"><?
-					echo renderImageBlock($var, $current_item[$var], $fieldSlug . ' image-field', $medias, array('fieldname' => $var));
+					// echo $ws->render($thisType, $var, $thisContent);
+					// $class = empty($current_item[$var]) ? 'viewing-toolbar' : '';
+					$class =  'image-field ' . $fieldSlug;
+					// echo $class;
+					echo $ws->renderImageBlock($var, $current_item[$var], $class, array('fieldname' => $var));
 				}
 				else if($fieldType == "checkbox")
 				{
@@ -274,18 +270,30 @@ if ($rr->action != "update" && $current_item['id'])
 				}
 				else if($fieldType == "select")
 				{
-					$options = array();
-					if($field['slug'] == 'default-section')
-						$options = $sections;
-					if(!empty($options))
-					{
-						echo renderSelect($var, $current_item[$var], $options);
-					}
+					
 				?><?
 				}
 				else if($fieldType == "text")
 				{
 				?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"><?
+				}
+				else if($fieldType == "order" && $fieldSlug == 'sections')
+				{
+					?><input name="section-order" type="hidden" form="edit-form"><div class="order-container"><?
+					$section_num = count($sections);
+					foreach($sections as $key => $s)
+					{
+
+						$select_html = '<select class="order-select" section="'.$s['id'].'" currentValue="'.($key + 1).'" onchange="reorder(this);">';
+						for($i = 0; $i < $section_num; $i++)
+						{
+							if($i == $key) $select_html .= '<option value = "' .($i + 1). '" selected>' . ($i + 1) . '</option>';
+							else $select_html .= '<option value = "' .($i + 1). '" >' . ($i + 1) . '</option>';
+						}
+						$select_html .= '</select>';
+						?><div class="order-item float-container"><?= $s['name1']; ?> <div class="order-control"><?= $select_html; ?></div></div><?
+					}
+					?></div><?
 				}
 			?></div>
 		</div><?
@@ -301,11 +309,8 @@ if ($rr->action != "update" && $current_item['id'])
 				iframe.postMessage(toid, location.origin);
 			});
 			window.addEventListener("message", (event) => {
-				console.log(event.data);
 				let response = JSON.parse(event.data);
-				for (const idx in response) {
-					medias.push(response[idx]);
-				}
+				medias = response;
 				updateMediaToolbar(medias);
 			}, false);
 		</script>
@@ -330,7 +335,6 @@ if ($rr->action != "update" && $current_item['id'])
 				class='btn on-grey'
 			>Update Object</button>
 		</div>
-	</div>
 	<!-- </form> -->
 	<form
 		method="post"
@@ -339,11 +343,19 @@ if ($rr->action != "update" && $current_item['id'])
 		id="edit-form"
 	>
 	</form>
-</div>
 <?php
 }
 else
 {
+	if(isset($_POST['section-order']) && !empty($_POST['section-order']))
+	{
+		$section_arr = json_decode($_POST['section-order'], true);
+		foreach($section_arr as $s)
+		{
+			$query = 'UPDATE objects SET `rank` = "'.$s['rank'].'" WHERE id="'.$s['id'].'"';
+			$db->query($query);
+		}
+	}
 	$new = array();
 	// objects
 	foreach($vars as $var)
@@ -373,14 +385,6 @@ else
 	$updated = update_object($current_item, $new, $siblings, $vars);
 
 	?><div class="self-container"><?
-		// should change this url to reflect updated url
-		$urls = array_slice($uu->urls, 0, count($uu->urls)-1);
-		$u = implode("/", $urls);
-		$url = $admin_path."browse/";
-		if(!empty($u))
-			$url.= $u."/";
-		$url.= $new['url'];
-		?><p><a href="<? echo $url; ?>"><?php echo $new['name1']; ?></a></p><?
 	if($updated)
 	{
 	?><p>Record successfully updated.</p><?
@@ -396,306 +400,4 @@ else
 	?></div><?
 }
 ?></div>
-</div>
-<style>
-	.wysiwyg-section
-	{
-/*		padding:20px;*/
-		background-color:#dedede;
-/*		margin-bottom:5px;*/
-position: relative;
-	}
-	.wysiwyg-edit-img
-	{
-		display: block;
-		cursor: pointer;
-	}
-	.wysiwyg-section textarea
-	{
-		background-color: #dedede;
-		cursor:pointer;
-		border:none;
-		resize: vertical;
-		padding: 5px;
-		display: block;
-	}
-	.wysiwyg-section textarea:focus
-	{
-		background-color: #fff;
-		outline:none;
-		cursor:text;
-	}
-
-	.wysiwyg-section textarea.wysiwyg-edit-figcaption
-	{
-		text-align: center;
-		padding-left: 30px;
-		padding-right: 30px;
-		margin-top:px;
-	}
-	
-	.wysiwyg-add-section {
-		cursor: pointer;
-		text-align: center;
-		color: #fff;
-		font-size: 12px;
-	}
-	.wysiwyg-add-toggle:hover,
-	.section-option:hover
-	{
-		background-color: #fff;
-		color: #000;
-	}
-	.wysiwyg-add-section .msg
-	{
-		display: inline-block;
-	}
-	.inline-icon
-	{
-/*		display: inline-block;*/
-		margin-right:5px;
-		font-size: 16px;
-
-	}
-	.toolbar
-	{
-		width: auto;
-	}
-	.msg
-	{
-/*		font-family: ;*/
-	}
-	.add-options-container,
-	.viewing-sectionOptions .add-prompt-container
-	{
-		display: none;
-	}
-	.viewing-sectionOptions .add-options-container
-	{
-		display: block;
-	}
-	.wysiwyg-add-toggle{
-		padding: 5px;
-		width: calc(100% + 20px);
-		position: relative;
-		padding-right: 25px;
-		color: transparent;
-	}
-	.wysiwyg-add-toggle:after
-	{
-		content: '+';
-		font-size: 20px;
-		text-align: right;
-		position: absolute;
-		right: 0;
-		top: 0;
-		color: #000;
-		border: 2px solid #000;
-		width: 30px;
-		height: 100%;
-/*		border-left: none;*/
-		padding: 3px 5px 0 0;
-		box-sizing: border-box;
-		padding-top: 3px;
-		border-top-left-radius: 50%;
-		border-bottom-left-radius: 50%;
-	}
-	.wysiwyg-add-toggle:hover,
-	.viewing-sectionOptions .wysiwyg-add-toggle
-	{
-		color: #fff;
-		background-color:#000;
-	}
-	.viewing-sectionOptions .wysiwyg-add-toggle:after
-	{
-		display: none;
-	}
-	.wysiwyg-add-toggle:hover:after
-	{
-		color: #fff;
-	}
-	.section-option
-	{
-		padding: 5px;
-		background-color:#000;
-	}
-	.section-option
-	{
-		margin-top:2px;
-	}
-	/*.preview-cell:hover .preview-removethisbtn:hover
-	{
-		background-color: #000;
-		color: #fff;
-	}
-	.preview-removethisbtn:hover + .preview-msg .preview-filename
-	{
-		display: none;
-	}
-	.preview-removethisbtn:hover + .preview-msg:after
-	{
-		content: 'remove this image';
-		display: block;
-	}*/
-	.viewing-media-upload #media-upload-container
-	{
-		opacity: 1;
-		pointer-events: auto;
-		transition: opacity .35s;
-	}
-	#media-upload-container
-	{
-		position: fixed;
-		opacity: 0;
-		left: 50%;
-		width: 500px;
-		height: 90vh;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		pointer-events: none;
-		background-color: #fff;
-		z-index: 500;
-		box-shadow: 5px 5px 12px #000;
-		background-color: #dedede;
-	}
-	#media-upload-container iframe
-	{
-		border: none;
-		width: 100%;
-		height: 100%;
-	}
-	#btn-closeMediaContainer
-	{
-		font-size: 20px;
-		position: absolute;
-		padding: 11px 15px;
-		left: 10px;
-		top: 10px;
-		cursor: pointer;
-	}
-	#btn-closeMediaContainer:hover
-	{
-		background-color: #000;
-		color: #fff;
-	}
-	.empty-msg
-	{
-		display: none;
-	}
-	.media-toolbar.empty .empty-msg
-	{
-		display: block;
-	}
-	.media-toolbar-toggle:after
-	{
-		/*content: "Choose uploaded image";
-		display: block;
-		text-align: center;
-		padding: 5px;
-		cursor:pointer;
-		font-size: 12px;
-		background-color: #000;
-		color: #fff;*/
-	}
-	.image-container
-	{
-		position: relative;
-		cursor: pointer;
-	}
-	.msg-container
-	{
-		display: none;
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		
-		top:0;
-		left:0;
-		pointer-events: none;
-		box-sizing: border-box;
-		text-align: center;
-		
-	}
-	.image-container > .msg-container
-	{
-		background-color: rgba(0, 0, 255, 0.75);
-		color: #fff;
-	}
-	.msg-container.msg-container-remove
-	{
-		background-color: rgba(255, 0, 0, 0.75);
-		color: #fff;
-	}
-	.msg-container > .msg
-	{
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%);
-	}
-	.image-container:hover .msg-container
-	{
-		display: block;
-	}
-	.image-container.viewing-toolbar:hover .msg-container
-	{
-		display: none;
-	}
-	.media-toolbar-toggle:hover:after
-	{
-		/*background-color: #fff;
-		color: #000;*/
-	}
-	.viewing-toolbar .media-toolbar-toggle:after
-	{
-		content: "close";
-/*		font-size: 16px;*/
-		padding: 5px;
-		cursor:pointer;
-		background-color: #fff;
-		display: block;
-		text-align: center;
-	}
-	.viewing-toolbar .media-toolbar-toggle:hover:after
-	{
-		background-color: #00f;
-		color: #fff;
-	}
-	img[src="null"]
-	{
-		display: none;
-	}
-	.btn-remove-wysiwyg-section
-	{
-		position: absolute;
-		right: 0px;
-		transform: translate(100%, 0);
-		padding: 2px 5px;
-/*		font-size: 12px;*/
-		display: none;
-/*		padding:;*/
-		font-size: 20px;
-		color: #f00;
-		cursor: pointer;
-		border: 2px solid #f00;
-		border-left: none;
-	}
-	.wysiwyg-section:hover .btn-remove-wysiwyg-section
-	{
-		display: block;
-	}
-	.btn-remove-wysiwyg-section:hover
-	{
-		background-color: #f00;
-		color: #fff;
-	}
-	.msg-container-remove
-	{
-		z-index:10;
-	}
-	.btn-remove-wysiwyg-section:hover + .msg-container-remove
-	{
-		display: block;
-	}
-
-</style>
+</main>

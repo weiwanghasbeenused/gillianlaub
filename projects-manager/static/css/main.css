@@ -81,10 +81,6 @@ aside {
 /*	background-color: #333;*/
 }
 
-#body-container {
-/*	background-color: #e3e3e3;*/
-}
-
 ::selection {
 	color: white;
 	background: red;
@@ -165,14 +161,6 @@ textarea.small {
 	height: 2em;
 }
 
-#body > div:nth-child(odd) .toolbar {
-	background-color: #e3e3e3;
-}
-
-#body > div:nth-child(even) .toolbar {
-	background-color: #ececec;
-}
-
 .toolbar {
 /*	width: 484px;*/
 	position: sticky;
@@ -250,10 +238,6 @@ select {
 	max-width: 100%;
 }
 
-#body {
-    width: 100%;
-    height: 100%;
-}
 
 /* utility classes */
 .preview {
@@ -429,7 +413,7 @@ footer
 {
 	margin-top:20px;
 	border-top:2px solid #000;
-	padding-top:20px;
+	padding:20px 0;
 }
 
 .msg-container
@@ -468,11 +452,6 @@ footer
 {
 	background-color: #dedede;
 }
-#form-container
-{
-	padding:20px;
-	background-color: #dedede;
-}
 .full-width{
 	width: 100vw;
 	max-width: 100%;
@@ -497,6 +476,19 @@ body.viewing-popup-window .popup-window-mask
     opacity: 0.75;
     pointer-events: auto;
     transition: opacity .35s;
+}
+main
+{
+	padding:20px;
+	background-color: #dedede;
+}
+.button-container
+{
+	margin-top: 20px;
+}
+.description
+{
+	margin-bottom: 20px;
 }
 @media screen and (max-device-width: 568px) {
 	html {
