@@ -120,7 +120,7 @@ $general_urls = array(
 	'browse' => '',
 	'add' => ''
 );
-if( count($uri) > 2)
+if( isset($uri) && count($uri) > 2)
 {
 	$uri_copy = $uri;
 	foreach($general_urls as $key => &$u)

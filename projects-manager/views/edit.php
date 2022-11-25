@@ -214,34 +214,38 @@ if ($rr->action != "update" && $current_item['id'])
                     if($current_item[$var])
                         echo htmlentities($current_item[$var]);
                 ?></textarea>
-                <? if($current_item[$var] && !empty(trimBreaksFromSides($current_item[$var]))){
-                	$body = trim($current_item[$var]);
-                	$body = str_replace("\r", '', $body);
-                	$body = str_replace("\n", '', $body);
-                	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
-                	$field_html = '';
-                	if(!empty($body_arr))
-                	{
-                		foreach($body_arr as $key => $block_temp)
-                		{
-                			$block_temp = trim($block_temp);
-                			if(!empty($block_temp))
-                			{
-                				preg_match($wysiwyg_section_opening_pattern, $block_temp, $match);
-                    			if(!empty($match) && !empty(trim($match[2]))){
-                    				$thisType = $match[1];
-                    				$thisContent = trimBreaksFromSides($match[2]);             
-                    				echo $ws->render($thisType, $var, $thisContent);
-                    			}
-                			}                        			
-                		}
-                		echo $field_html;
-                	}
-                	else
-                		echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
-                }
-                else
-                	echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
+                <? 
+
+                echo $ws->render($var, trimBreaksFromSides($current_item[$var]));
+
+                // if($current_item[$var] && !empty(trimBreaksFromSides($current_item[$var]))){
+                // 	$body = trim($current_item[$var]);
+                // 	$body = str_replace("\r", '', $body);
+                // 	$body = str_replace("\n", '', $body);
+                // 	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
+                // 	$field_html = '';
+                // 	if(!empty($body_arr))
+                // 	{
+                // 		foreach($body_arr as $key => $block_temp)
+                // 		{
+                // 			$block_temp = trim($block_temp);
+                // 			if(!empty($block_temp))
+                // 			{
+                // 				preg_match($wysiwyg_section_opening_pattern, $block_temp, $match);
+                //     			if(!empty($match) && !empty(trim($match[2]))){
+                //     				$thisType = $match[1];
+                //     				$thisContent = trimBreaksFromSides($match[2]);             
+                //     				echo $ws->render($thisType, $var, $thisContent);
+                //     			}
+                // 			}                        			
+                // 		}
+                // 		echo $field_html;
+                // 	}
+                // 	else
+                // 		echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
+                // }
+                // else
+                // 	echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
                         
 				// ** end minimal wysiwig toolbar **
 				}

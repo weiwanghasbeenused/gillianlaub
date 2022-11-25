@@ -13,6 +13,7 @@ if(!empty($_POST)){
 		$params = json_decode(stripslashes($_POST['params']), true);
 		if(isset($params['params']))
 			$params['params'] = json_decode(stripslashes($params['params']), true);
+
 		echo $ws->$function(...$params);
 	}
 	else

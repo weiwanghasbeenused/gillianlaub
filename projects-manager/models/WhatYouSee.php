@@ -10,26 +10,60 @@ class WhatYouSee extends WhatYouSeeIsWhatYouGet{
 		if(!empty($new))
 			array_merge($this->$media, $new);
 	}
-	public function render($type, $var, $content, $params = array()){
+	public function render($var, $input){
 		$output = '';
-		if(!empty($content) || ( isset($params['acceptEmptyContent']) && $params['acceptEmptyContent']))
+		$isEmpty = false;
+		if(!empty($input) || ( isset($params['acceptEmptyContent']) && $params['acceptEmptyContent']))
 		{
-			$output = '<div class="wysiwyg-section">';
-			$output .= $this->renderRemove();
+			$temp_arr = explode($this->patterns['wysiwyg_section_ending_pattern'], $input);
+			if( count($temp_arr) > 1)
+			{
+				$output .= '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
+				foreach($temp_arr as $block_temp)
+                {
+                	preg_match($this->patterns['wysiwyg_section_opening_pattern'], $block_temp, $match);
+        			if(!empty($match) && !empty(trim($match[2]))){
+        				$thisType = $match[1];
+        				$thisContent = trimBreaksFromSides($match[2]);             
+        				$output .= '<div class="wysiwyg-section">';
+						$output .= $this->renderRemove();
 
-			if($type == 'figure')
-				$output .= $this->renderFigure($var, $content, ...$params);
-			else if($type == 'p' || $type == 'text' )
-				$output .= $this->renderText($var, $content, ...$params);
-			$output .= '</div>';
-			$output .= '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
+						if($thisType == 'figure')
+							$output .= $this->renderFigure($var, $input);
+						else if($thisType == 'p' || $thisType == 'text' )
+							$output .= $this->renderText($var, $input);
+						$output .= '</div>';
+						$output .= '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
+        			}
+                }
+				
+			}
+			else
+				$isEmpty = true;
 		}
-		
+		else
+			$isEmpty = true;
+		if($isEmpty)
+			return '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
 		return $output;
 		
 	}
+	public function renderBlock($type, $var, $content, $params = array()){
+		// $output = '';
+		
+		$output = '<div class="wysiwyg-section">';
+		$output .= $this->renderRemove();
+		if($type == 'figure')
+			$output .= $this->renderFigure($var, $content, ...$params);
+		else if($type == 'p' || $type == 'text' )
+			$output .= $this->renderText($var, $content, ...$params);
+		$output .= '</div>';
+		$output .= '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
+		
+		return $output;
+	}
 	
-	private function renderText($var, $content, $acceptEmptyContent = false){
+	public function renderText($var, $content, $acceptEmptyContent = false){
 		$output = str_replace('<br>', "\n\r", $content);
 		$output = trim($output);
 		if(!empty($output) || $acceptEmptyContent){
@@ -45,27 +79,31 @@ class WhatYouSee extends WhatYouSeeIsWhatYouGet{
 			foreach($attr as $key => $val)
 				$attr_str .= ' ' . $key . '="' . $val . '"';
 		}
-		$output = '<div class="image-container '.$class.'"'.$attr_str.'>' . $this->renderMediaToolbar();
-		if(empty($value))
-			$src = 'null';
-		else 
-			$src = $value; 
 		
+		if(empty($value) || $value == 'null'){
+			$src = 'null';
+			$class .= ' empty';
+		}
+		else{
+			$src = $value; 
+		}
+		$output = '<div class="image-container '.$class.'"'.$attr_str.'>' . $this->renderMediaToolbar();
 		$output .= '<img class="display-image" onclick="displayMediaToolbar(this);" src="'. $src .'" >';
-		$output .= '<div class="msg-container"><span class="msg"></span></div></div>';
+		$output .= '<div class="msg-container" onclick="displayMediaToolbar(this);"><span class="msg"></span></div></div>';
 		return $output;
 	}
 
 	private function renderMediaToolbar($id = ''){
-		$toolbar_html = '<div class="media-toolbar-toggle" onclick="displayMediaToolbar(this);"></div>';
-		$toolbar_html .= empty($this->medias) ? '<div id="'.$id.'" class="toolbar media-toolbar empty">' : '<div id="'.$id.'" class="toolbar media-toolbar">';
-		// $toolbar_html .= '<div class="empty-msg">Please upload media first.</div>';
+		$class = "media-toolbar-container toolbar-container";
+		if(empty($this->medias)) $class .= ' empty'; 
+		$toolbar_html = '<div class="'.$class.'"><div class="media-toolbar-toggle" onclick="displayMediaToolbar(this);"></div>';
+		$toolbar_html .= '<div id="'.$id.'" class="toolbar media-toolbar">';
 		foreach($this->medias as $m)
 			$toolbar_html .= '<div class="toolbar-image-container" ><img onclick="useThisImage(this);" src="' . $this->m_rel($m) . '"></div>';
-		$toolbar_html .= '</div>';
+		$toolbar_html .= '</div><div class="msg-container"><div class="msg"></div></div></div>';
 		return $toolbar_html;
 	}
-	function renderFigure($var, $content, $imageBlockClass=''){
+	public function renderFigure($var, $content, $imageBlockClass=''){
 		$output = '';
 		preg_match($this->patterns['img'], $content, $img_match);
 		if(!empty($img_match))

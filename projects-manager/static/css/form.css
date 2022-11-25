@@ -221,10 +221,12 @@
 		text-align: center;
 		
 	}
-	.image-container > .msg-container
+	.image-container > .msg-container,
+	.media-toolbar-container > .msg-container
 	{
 		background-color: rgba(0, 0, 255, 0.75);
 		color: #fff;
+		pointer-events: auto;
 	}
 	.msg-container.msg-container-remove
 	{
@@ -238,10 +240,29 @@
 		top: 50%;
 		transform: translate(-50%, -50%);
 	}
-	.image-container .msg:after
+	.image-container > .msg-container > .msg:after
 	{
 		content: "Relace this image";
 		display: block;
+	}
+	
+	.media-toolbar-container.empty > .msg-container > .msg:after
+	{
+		content: "Please upload media first.";
+		display: block;
+	}
+	.image-container.empty > .msg-container,
+	.media-toolbar-container.empty > .msg-container
+	{
+		display: block;
+		position: static;
+	}
+	.image-container.empty > .media-toolbar-container.empty ~ .msg-container
+	{
+		display: none;
+	}
+	.image-container.empty > .msg-container > .msg:after{
+		content: "Insert an image";
 	}
 	.image-container > .media-toolbar.empty ~ .msg-container
 	{
@@ -253,15 +274,11 @@
 		/*position: static;
 		transform: none;*/
 	}
-	.image-container > .media-toolbar.empty ~ .msg-container > .msg:after
-	{
-		content: "Please upload media first";
-	}
-	.image-container:hover .msg-container
+	.image-container:hover > .msg-container
 	{
 		display: block;
 	}
-	.image-container.viewing-toolbar:hover .msg-container
+	.image-container.viewing-toolbar > .msg-container
 	{
 		display: none;
 	}
@@ -337,4 +354,10 @@
 	.order-item + .order-item
 	{
 		border-top: 2px solid #000;
+	}
+	.display-image
+	{
+		max-height: 500px;
+		padding: 10px;
+		object-fit: contain;
 	}

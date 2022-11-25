@@ -176,7 +176,7 @@ function displayMediaToolbar(target)
 	let thisWrapper = target.parentNode;
 	while(!thisWrapper.classList.contains('image-container') && thisWrapper != document.body)
 		thisWrapper = thisWrapper.parentNode;
-	target.parentNode.classList.toggle('viewing-toolbar');
+	thisWrapper.classList.toggle('viewing-toolbar');
 }
 function updateMediaToolbar(media_arr = false)
 {
@@ -193,6 +193,13 @@ function updateMediaToolbar(media_arr = false)
 				el.innerHTML = html;
 			});
 		}
+		let sEmptyMediaToolbarContainers = document.querySelectorAll('.media-toolbar-container.empty');
+		if(sEmptyMediaToolbarContainers)
+		{
+			[].forEach.call(sEmptyMediaToolbarContainers, function(el, i){
+				el.classList.remove('empty');
+			});
+		}
 	}
 }
 function toggleSectionOptions(target)
@@ -203,13 +210,16 @@ function toggleSectionOptions(target)
 function useThisImage(target)
 {
 	let src = target.getAttribute('src');
-	let wrapper = target.parentNode.parentNode.parentNode;
-	let img = wrapper.querySelector('.display-image');
+	let thisWrapper = target.parentNode;
+	while(!thisWrapper.classList.contains('image-container') && thisWrapper != document.body)
+		thisWrapper = thisWrapper.parentNode;
+	let img = thisWrapper.querySelector('.display-image');
 	if(img)
 		img.src = src;
 	else
 		console.log('missing .display-image');
-	wrapper.classList.remove('viewing-toolbar');
+	thisWrapper.classList.remove('viewing-toolbar');
+	thisWrapper.classList.remove('empty');
 }
 
 function reqeustWhatYouSeeFunctions(functionName, media=[], param = '', onComplete){
@@ -240,7 +250,7 @@ function addSectionHere(target, name, type, media){
 	{
 		thisWysiwygSection = thisWysiwygSection.parentNode;
 	}
-    console.log('type = ' + type);
+
 	if(type == 'text' || type == 'p')
 	{
 		let existingElement = document.querySelector('.wysiwyg-edit-p');
@@ -253,8 +263,9 @@ function addSectionHere(target, name, type, media){
 			temp.value = '';
 			if(thisWysiwygSection.nextElementSibling)
 			{
-				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
 				thisWysiwygSection.parentNode.insertBefore(thisWysiwygSection.cloneNode(true), thisWysiwygSection.nextElementSibling);
+				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
+				
 			}
 			else
 			{
@@ -273,16 +284,18 @@ function addSectionHere(target, name, type, media){
 		let existingElement = document.querySelector('.wysiwyg-edit-figure');
 		if(existingElement)
 		{
+			console.log(existingElement);
 			toggleSectionOptions(target);
 			let parent = existingElement.parentNode.cloneNode(true);
 			let temp = parent.querySelector('.wysiwyg-edit-figure');
 			temp.setAttribute('fieldname', name);
 			temp.querySelector('.wysiwyg-edit-figcaption').value = '';
 			temp.querySelector('.display-image').src = 'null';
+			temp.querySelector('.image-container').classList.add('empty');
 			if(thisWysiwygSection.nextElementSibling)
 			{
-				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
 				thisWysiwygSection.parentNode.insertBefore(thisWysiwygSection.cloneNode(true), thisWysiwygSection.nextElementSibling);
+				thisWysiwygSection.parentNode.insertBefore(parent, thisWysiwygSection.nextElementSibling);
 			}
 			else
 			{
@@ -294,6 +307,7 @@ function addSectionHere(target, name, type, media){
 		extraParams = '{"imageBlockClass": "viewing-toolbar"}';
 		extraParams = extraParams.replace(/"/g, '\\"');
 		params = '{ "type": "figure", "var":"' + name + '", "content": "null", "params": "'+extraParams+'"}';
+		console.log(params);
 		params = params.replace(/"/g, '\\"');
 	}
 
@@ -311,7 +325,8 @@ function addSectionHere(target, name, type, media){
 		
 		toggleSectionOptions(target);
 	}
-	reqeustWhatYouSeeFunctions('render', media, params, postRequest);
+	console.log(params);
+	reqeustWhatYouSeeFunctions('renderBlock', media, params, postRequest);
 }
 
 function renderPreviewCell(imgs, filenames){
