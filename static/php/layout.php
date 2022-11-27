@@ -69,7 +69,7 @@ function renderLinkItem($item, $class=''){
 	return $output;
 }
 function renderGalleryItem($item, $class=''){
-	$output = '<div class="grid-item '.$class.'"><div class="grid-item-thumbnail-container"><img loading="lazy" alt="'.$item['caption'].'" class="grid-item-thumbnail lightbox-btn" src="'.m_url($item).'"></div></div>';
+	$output = '<div class="grid-item '.$class.'"><a class="grid-item-thumbnail-container" href="' . $item['fullUrl'].'"><img loading="lazy" alt="'.$item['caption'].'" class="grid-item-thumbnail" src="'.m_url($item).'"></a></div>';
 	return $output;
 }
 

@@ -214,8 +214,9 @@ function useThisImage(target)
 	while(!thisWrapper.classList.contains('image-container') && thisWrapper != document.body)
 		thisWrapper = thisWrapper.parentNode;
 	let img = thisWrapper.querySelector('.display-image');
-	if(img)
+	if(img){
 		img.src = src;
+	}
 	else
 		console.log('missing .display-image');
 	thisWrapper.classList.remove('viewing-toolbar');
@@ -403,77 +404,78 @@ function closeMediaContainer(){
 	let iframe = document.querySelector('#media-upload-container iframe');
 	iframe.src = iframe.src;
 }
-function encodeWysiwygFigure(editContainer){
-	let output = '';
-	let img = editContainer.querySelector('img.display-image');
-	let src = img.src;
-	if(src != 'null')
-	{
-		output = '[wysiwygsection wysiwygtag="figure"]';
-		let caption = editContainer.querySelector('textarea.wysiwyg-edit-figcaption').value;
-		output += '<img class="wysiwygimg" src="'+src+'">';
-		if(caption !== '')
-			output += '<figcaption class="wysiwygfigcaption">'+caption+'</figcaption>';
-		output += '[/wysiwygsection]';
-	}
+// function encodeWysiwygFigure(editContainer){
+// 	let output = '';
+// 	let img = editContainer.querySelector('img.display-image');
+// 	let src = img.getAttribute('src');
+// 	if(src != 'null')
+// 	{
+// 		output = '[wysiwygsection wysiwygtag="figure"]';
+// 		let caption = editContainer.querySelector('textarea.wysiwyg-edit-figcaption').value;
+// 		output += '<img class="wysiwygimg" src="'+src+'">';
+// 		if(caption !== '')
+// 			output += '<figcaption class="wysiwygfigcaption">'+caption+'</figcaption>';
+// 		output += '[/wysiwygsection]';
+// 	}
 	
-	return output;
-}
+// 	return output;
+// }
 
-function encodeWysiwygP(editContainer){
-	let output = '';
-	if(editContainer.value !== '');
-		output = '[wysiwygsection wysiwygtag="p"]' + editContainer.value + '[/wysiwygsection]';
-	return output;
-}
-function compileWysiwygField(field){
-	let output = '';
-	let name = field.getAttribute('name');
-	let this_editContainers = document.querySelectorAll('.wysiwyg-edit-container[fieldname="'+name+'"]');
-	[].forEach.call(this_editContainers, function(el){
-		let thisType = el.getAttribute('type');
-		if(thisType == 'figure')
-			output += encodeWysiwygFigure(el);
-		else if(thisType == 'p')
-			output += encodeWysiwygP(el);
-	});
+// function encodeWysiwygP(editContainer){
+// 	let output = '';
+// 	if(editContainer.value !== '');
+// 		output = '[wysiwygsection wysiwygtag="p"]' + editContainer.value + '[/wysiwygsection]';
+// 	return output;
+// }
+// function compileWysiwygField(field){
+// 	let output = '';
+// 	let name = field.getAttribute('name');
+// 	let this_editContainers = document.querySelectorAll('.wysiwyg-edit-container[fieldname="'+name+'"]');
+// 	[].forEach.call(this_editContainers, function(el){
+// 		let thisType = el.getAttribute('type');
+// 		if(thisType == 'figure')
+// 			output += encodeWysiwygFigure(el);
+// 		else if(thisType == 'p')
+// 			output += encodeWysiwygP(el);
+// 	});
 
-	return output;
-}
+// 	return output;
+// }
 
-function editSubmit(){
-	let sWysiwyg_field = document.getElementsByClassName('wysiwyg-field');
-	if(sWysiwyg_field.length != 0)
-	{
-		[].forEach.call(sWysiwyg_field, function(el){
-			let updateValue = compileWysiwygField(el);
-			el.value = updateValue;
-		});
-	}
-	let sImage_field = document.getElementsByClassName('image-field');
-	if(sImage_field.length != 0)
-	{
-		[].forEach.call(sImage_field, function(el){
-			let name = el.getAttribute('fieldname');
-			let src = el.querySelector('.display-image').getAttribute('src');
-			document.querySelector('input[name='+name+']').value = src;
-		});
-	}
-	let sCheckbox_field = document.getElementsByClassName('checkbox-field');
-	let sOrder_select = document.getElementsByClassName('order-select');
-	if(sOrder_select.length != 0)
-	{
-		let temp = [];
-		[].forEach.call(sOrder_select, function(el){
-			temp.push('{ "id": "'+el.getAttribute('section')+'", "rank":"' +el.value+'"}');
-		});
-		temp = '[' + temp.join(',') + ']';
-		document.querySelector('input[name="section-order"]').value = temp;
-	}
+// function editSubmit(mediaPath){
+// 	let sWysiwyg_field = document.getElementsByClassName('wysiwyg-field');
+// 	if(sWysiwyg_field.length != 0)
+// 	{
+// 		[].forEach.call(sWysiwyg_field, function(el){
+// 			let updateValue = compileWysiwygField(el);
+// 			el.value = updateValue;
+// 		});
+// 	}
+// 	let sImage_field = document.getElementsByClassName('image-field');
+// 	if(sImage_field.length != 0)
+// 	{
+// 		[].forEach.call(sImage_field, function(el){
+// 			let name = el.getAttribute('fieldname');
+// 			let src = el.querySelector('.display-image').getAttribute('src');
+// 			src = src.replace(mediaPath, '/');
+// 			document.querySelector('input[name='+name+']').value = src;
+// 		});
+// 	}
+// 	let sCheckbox_field = document.getElementsByClassName('checkbox-field');
+// 	let sOrder_select = document.getElementsByClassName('order-select');
+// 	if(sOrder_select.length != 0)
+// 	{
+// 		let temp = [];
+// 		[].forEach.call(sOrder_select, function(el){
+// 			temp.push('{ "id": "'+el.getAttribute('section')+'", "rank":"' +el.value+'"}');
+// 		});
+// 		temp = '[' + temp.join(',') + ']';
+// 		document.querySelector('input[name="section-order"]').value = temp;
+// 	}
 	
-	let form = document.getElementById('edit-form');
-	form.submit();
-}
+// 	let form = document.getElementById('edit-form');
+// 	form.submit();
+// }
 
 function removeWysiwygSection(target)
 {

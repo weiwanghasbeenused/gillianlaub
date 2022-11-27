@@ -78,19 +78,21 @@ if($item['notes']){
 			}
 			$media = $oo->media($detail_item['id']);
 			$media_key_as_id = array();
-			foreach($media as $m)
+			foreach($media as &$m)
 			{
-				$media_key_as_id[$m['id']] = $m;
+				$fullUrl = implode('/', $uri) . '?section=' . $section . '&layout=scroll#figure-'.$m['id'];
+				$m['fullUrl'] = $fullUrl;
 			}
+			unset($m);
 			if($current_layout == 'grid')
 			{
-				
-				echo renderGrid($media, $col_number, 'gallery-container', 'gallery');
+				$gridItems = $wg->prepareGridItems($detail_item['body']);
+				echo renderGrid($gridItems, $col_number, 'gallery-container', 'gallery');
 			}
 			else if($current_layout == 'scroll')
 			{
 				?><div id="gallery-container" class="scroll-gallery-container large"><? 
-					$body = $gg->render($detail_item['body']);
+					$body = $wg->renderScroll($detail_item['body']);
 					echo $body;
 				 ?></div><?
 			}
@@ -225,7 +227,13 @@ if($item['notes']){
     	}
     	
     }
-
+    // var sHashlinkTarget = document.getElementsByClassName('hashlink-target');
+    // var sMain_header = document.getElementById('main-header');
+    // var sProject_footer = document.getElementById('main-header');
+    // centerHashlinkTargets(sHashlinkTarget, sMain_header.offsetHeight, sProject_footer.offsetHeight);
+    // window.addEventListener('resize', function(){
+    // 	centerHashlinkTargets(sHashlinkTarget, sMain_header.offsetHeight, sProject_footer.offsetHeight);
+    // });
 </script>
 <? require_once('views/lightbox.php'); ?>
 <style>

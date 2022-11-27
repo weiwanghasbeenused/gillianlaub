@@ -29,9 +29,9 @@ class WhatYouSee extends WhatYouSeeIsWhatYouGet{
 						$output .= $this->renderRemove();
 
 						if($thisType == 'figure')
-							$output .= $this->renderFigure($var, $input);
+							$output .= $this->renderFigure($var, $thisContent);
 						else if($thisType == 'p' || $thisType == 'text' )
-							$output .= $this->renderText($var, $input);
+							$output .= $this->renderText($var, $thisContent);
 						$output .= '</div>';
 						$output .= '<div class="wysiwyg-section add-parent">' . $this->renderAdd($var) . '</div>';
         			}
@@ -88,7 +88,7 @@ class WhatYouSee extends WhatYouSeeIsWhatYouGet{
 			$src = $value; 
 		}
 		$output = '<div class="image-container '.$class.'"'.$attr_str.'>' . $this->renderMediaToolbar();
-		$output .= '<img class="display-image" onclick="displayMediaToolbar(this);" src="'. $src .'" >';
+		$output .= '<img class="display-image" onclick="displayMediaToolbar(this);" src="'. $src .'">';
 		$output .= '<div class="msg-container" onclick="displayMediaToolbar(this);"><span class="msg"></span></div></div>';
 		return $output;
 	}

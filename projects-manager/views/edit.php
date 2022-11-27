@@ -3,8 +3,6 @@ define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/static/php/editFunctions.php');
 require_once(__ROOT__.'/models/WhatYouSee.php');
 
-// $section = isset($_GET['section']) ? $_GET['section'] : '';
-
 $project_item = $item;
 $form_url = $admin_path."edit/".$uu->urls();
 if(!empty($section)) $form_url .= '?section=' . $section;
@@ -79,16 +77,17 @@ $fields = array(
 );
 $checkbox_options = array(
 	'layout' => array(
-		'scroll' => array(
-			'displayName' => 'Scroll',
-			'slug' => 'scroll',
-			'checked' => true
-		),
 		'grid' => array(
 			'displayName' => 'Grid',
 			'slug' => 'grid',
-			'checked' => false
+			'checked' => true
 		),
+		'scroll' => array(
+			'displayName' => 'Scroll',
+			'slug' => 'scroll',
+			'checked' => false
+		)
+		
 	),
 );
 $select_options = array();
@@ -191,10 +190,12 @@ if ($rr->action != "update" && $current_item['id'])
 
 // object contents
 ?>
+<script src="<?= $admin_path; ?>static/js/WhatYouSee.js"></script>
 <script>
 	var toid = <?= $current_item['id']; ?>;
 	var medias = <?= json_encode($medias, true); ?>;
 	var media_path = '<?= $media_path; ?>';
+	
 </script>
 	<div class="form">
 		<script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
@@ -206,9 +207,9 @@ if ($rr->action != "update" && $current_item['id'])
 			$fieldType = $field['type'];
 			$displayName = $field['displayName'];
 			$fieldSlug = $field['slug'];
-		?><div class="field">
+		?><div id="field-<?= $var; ?>" class="field">
 			<div class="field-name"><? echo $displayName; ?></div>
-			<div class="field-body">
+			<div id="field-body-<?= $var; ?>" class="field-body">
 			<? if($fieldType == "wysiwyg") { ?>
                 <textarea name='<? echo $var; ?>' class='large dontdisplay wysiwyg-field' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
                     if($current_item[$var])
@@ -335,7 +336,7 @@ if ($rr->action != "update" && $current_item['id'])
 				form="edit-form"
 			>
 			<button
-				onclick='editSubmit();'
+				onclick='wsForm.submit();'
 				class='btn on-grey'
 			>Update Object</button>
 		</div>
@@ -347,6 +348,9 @@ if ($rr->action != "update" && $current_item['id'])
 		id="edit-form"
 	>
 	</form>
+	<script>
+		var wsForm = new WhatYouSee(document.getElementById("edit-form"), document.querySelector('.form'), media_path);
+	</script>
 <?php
 }
 else

@@ -35,3 +35,27 @@ function checkCookie(name) {
 	else
 		return false;
 }
+
+function centerHashlinkTargets(targets, topDev=0, bottomDev=0){
+	
+	let wH = window.innerHeight;
+	let viewportH = wH - topDev - bottomDev;
+	[].forEach.call(targets, function(el, i){
+		let padding = 'calc(' + viewportH / 2 + 'px - ' + 50 * el.getAttribute('ratio') + '% + '+topDev+'px)';
+		let margin = 'calc(' + 50 * el.getAttribute('ratio') + '% - ' + viewportH / 2 + 'px - '+topDev+'px)';
+		el.style.paddingTop = padding;
+		el.style.marginTop = margin;
+		console.log(el);
+	});
+}
+
+function centerHashlinkTarget(target, topDev=0, bottomDev=0){
+	let wH = window.innerHeight;
+	let viewportH = wH - topDev - bottomDev;
+	// let padding = 'calc(' + viewportH / 2 + 'px - ' + 50 * el.getAttribute('ratio') + '% + '+topDev+'px)';
+	let padding = (viewportH - target.offsetHeight) / 2 + 'px';
+	// let margin = 'calc(' + 50 * el.getAttribute('ratio') + '% - ' + viewportH / 2 + 'px - '+topDev+'px)';
+	let margin = (target.offsetHeight - viewportH) / 2 + 'px';
+	target.parentNode.style.paddingTop = padding;
+	target.parentNode.style.marginTop = margin;
+}

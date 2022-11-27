@@ -60,16 +60,15 @@ a {
     left: 0;
     z-index: 500;
     background-color: #fff;
+    text-align: center;
+    letter-spacing: 0.03em;
 }
 #site-name
 {
     width: 260px;
-    /*height: 24px;*/
-    /*background-image: url('../../media/jpg/title_32.jpg');*/
     background-size: 100%;
     margin: 0 auto;
     display: block;
-    /*text-align: center;*/
 }
 #site-name > img
 {
@@ -90,23 +89,18 @@ a {
     margin-top: 2px;
     cursor: pointer;
 }
-#main-header-btn-container
-{
-    display: none;
-    margin-top: 10px;
-    text-align: center;
-    letter-spacing: 0.03em;
-}
-body.home #main-header-btn-container
-{
-    display: block;
-}
 #cat-toggle-btn-container
 {
-    display: inline-flex;
+    
     align-items: center;
-    justify-content: center;
+    margin-top: 10px;
+    display: none;
 }
+body.home #cat-toggle-btn-container
+{
+    display: inline-flex;
+}
+
 #cat-toggle-btn-container > *
 {
     /*float: left;*/
@@ -143,19 +137,9 @@ body[category="commissions"] #cat-toggle-btn:after
 {
     left: 32px;
 }
-
-#cat-toggle-btn-container.inactive #cat-toggle-btn:after
-{
-    display: none;
-}
-#cat-toggle-btn-container.inactive 
-{
-    display: none;
-}
 .about-btn.in-header
 {
     display: none;
-    /*position: fixed;*/
 }
 #main-footer
 {
@@ -262,7 +246,10 @@ body[category="commissions"] #projects-grid-container
 }
 .gallery-image
 {
+    display: block;
     margin: 0 auto;
+/*    max-height: 50vh;*/
+/*    object-fit: contain;*/
 }
 .caption
 {
@@ -296,7 +283,7 @@ body[category="commissions"] #projects-grid-container
 }
 .gallery-image
 {
-    display: block;
+    
 }
 .cross-icon
 {
@@ -384,7 +371,11 @@ body[category="commissions"] #projects-grid-container
 {
     left: 50%;
 }
-
+.hashlink-target
+{
+/*    padding-top: calc(50vh - 50%);*/
+/*    margin-top: calc(50% - 50vh);*/
+}
 @media screen and (min-width: 321px) {
     .middle
     {
@@ -428,7 +419,7 @@ body[category="commissions"] #projects-grid-container
         padding-top: 20px;
         padding-bottom: 20px;
     }
-    #main-header-btn-container
+    #cat-toggle-btn-container
     {
         margin-top: 15px;
     }
@@ -549,26 +540,22 @@ body[category="commissions"] #projects-grid-container
     #main-header
     {
         display: flex;
-        justify-content: center;
-    }
-    #main-header-btn-container
-    {
-        display: block;
-        /*float: right;*/
-        margin-top: 0px;
-        flex: 1;
-        text-align: right;
+        align-items: center;
     }
     #site-name
     {
-        width: 320px;
+        flex-basis: 0 0 320px;
         padding-top: 2px;
-        /*float: left;*/
+    }
+    .about-btn-container
+    {
+        flex: 1;
+        text-align: center;
     }
     .about-btn.in-header
     {
         display: inline-block;
-        margin-right: 15px;
+        margin-top: 3px;
     }
     #main-footer
     {
@@ -581,6 +568,10 @@ body[category="commissions"] #projects-grid-container
     #project-container
     {
         padding-top: 96px;
+    }
+    #cat-toggle-btn-container
+    {
+        margin-top: 0px;
     }
     #cat-toggle-btn-container.inactive 
     {
@@ -607,8 +598,6 @@ body[category="commissions"] #projects-grid-container
     {
         width: 360px;
         padding-top: 0;
-        /*height: 42px;*/
-        /*background-image: url('../../media/jpg/title_58.jpg');*/
     }
     #main-header
     {
@@ -638,10 +627,6 @@ body[category="commissions"] #projects-grid-container
     {
         width: 50vw;
     }
-    .about-btn.in-header
-    {
-        margin-right: 20px;
-    }
     .cross-icon
     {
         width: 36px;
@@ -665,7 +650,8 @@ body[category="commissions"] #projects-grid-container
     {
         padding-top:110px;
     }
-    #main-header-btn-container
+    #cat-toggle-btn-container,
+    #about-btn-container
     {
         margin-top: 2px;
     }
