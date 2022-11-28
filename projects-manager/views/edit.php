@@ -237,7 +237,7 @@ if ($rr->action != "update" && $current_item['id'])
 			<div class="field-name"><? echo $displayName; ?></div>
 			<div id="field-body-<?= $var; ?>" class="field-body">
 			<? if($fieldType == "wysiwyg") { ?>
-                <textarea name='<? echo $var; ?>' class='large dontdisplay wysiwyg-field' id='<? echo $var; ?>-textarea' onclick="showToolBar('<? echo $var; ?>'); resetViews('<? echo $var; ?>', default_editor_mode);" onblur="" style="display: none;" form="edit-form"><?
+                <textarea name='<? echo $var; ?>' class='large dontdisplay wysiwyg-field' id='<? echo $var; ?>-textarea' onblur="" style="display: none;" form="edit-form"><?
                     if($current_item[$var])
                         echo htmlentities($current_item[$var]);
                 ?></textarea>
@@ -274,7 +274,7 @@ if ($rr->action != "update" && $current_item['id'])
 				}
 				else if($fieldType == "text")
 				{
-				?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" onclick="hideToolBars(); resetViews('', default_editor_mode);" form="edit-form"><?
+				?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" form="edit-form"><?
 				}
 				else if($fieldType == "order" && $fieldSlug == 'sections')
 				{
