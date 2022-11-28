@@ -12,6 +12,7 @@ $db_name = 'Projects-manager';
 require_once($config_dir."url.php");
 require_once($config_dir."request.php");
 require_once($config_dir."org-settings.php");
+require_once($admin_root."lib/lib.php");
 
 // logged in user via .htaccess, .htpasswd
 // $user = $_SERVER['REMOTE_USER'] ? $_SERVER['REMOTE_USER'] : $_SERVER['REDIRECT_REMOTE_USER'];
