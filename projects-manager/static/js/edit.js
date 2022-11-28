@@ -15,8 +15,7 @@ function link(name) {
 // 	document.getElementById(name + '-link').addEventListener('click', function(e) {resignImageContainer(name);}, false);
 // 	document.getElementById(name + '-indent').addEventListener('click', function(e) {resignImageContainer(name);}, false);
 // 	document.getElementById(name + '-reset').addEventListener('click', function(e) {resignImageContainer(name);}, false);
-// }
-
+// 
 function resignImageContainer(name) {
 	var imagecontainer = document.getElementById(name + '-imagecontainer');
 	if (imagecontainer.style.display === 'block') {
@@ -285,7 +284,6 @@ function addSectionHere(target, name, type, media){
 		let existingElement = document.querySelector('.wysiwyg-edit-figure');
 		if(existingElement)
 		{
-			console.log(existingElement);
 			toggleSectionOptions(target);
 			let parent = existingElement.parentNode.cloneNode(true);
 			let temp = parent.querySelector('.wysiwyg-edit-figure');
@@ -293,6 +291,7 @@ function addSectionHere(target, name, type, media){
 			temp.querySelector('.wysiwyg-edit-figcaption').value = '';
 			temp.querySelector('.display-image').src = 'null';
 			temp.querySelector('.image-container').classList.add('empty');
+			temp.querySelector('.image-container').classList.add('viewing-toolbar');
 			if(thisWysiwygSection.nextElementSibling)
 			{
 				thisWysiwygSection.parentNode.insertBefore(thisWysiwygSection.cloneNode(true), thisWysiwygSection.nextElementSibling);
@@ -308,7 +307,6 @@ function addSectionHere(target, name, type, media){
 		extraParams = '{"imageBlockClass": "viewing-toolbar"}';
 		extraParams = extraParams.replace(/"/g, '\\"');
 		params = '{ "type": "figure", "var":"' + name + '", "content": "null", "params": "'+extraParams+'"}';
-		console.log(params);
 		params = params.replace(/"/g, '\\"');
 	}
 

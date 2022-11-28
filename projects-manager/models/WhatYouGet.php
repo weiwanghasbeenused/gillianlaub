@@ -71,7 +71,10 @@ class WhatYouGet extends WhatYouSeeIsWhatYouGet{
 								$type = substr($temp, strpos($temp, '.') + 1);
 								$this_item['id'] = $media_id;
 								$this_item['type'] = $type;
-								$fullUrl = implode('/', $this->uri) . '?section=' . $_GET['section'] . '&layout=scroll#figure-'.$media_id;
+								if(isset($_GET['section']))
+									$fullUrl = implode('/', $this->uri) . '?section=' . $_GET['section'] . '&layout=scroll#figure-'.$media_id;
+								else
+									$fullUrl = implode('/', $this->uri) . '?layout=scroll#figure-'.$media_id;
 								$this_item['fullUrl'] = $fullUrl;
         					}
         					if(strpos($input, '<figcaption class="wysiwygfigcaption">') !== false){

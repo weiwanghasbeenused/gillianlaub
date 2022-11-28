@@ -264,6 +264,10 @@
 	.image-container.empty > .msg-container > .msg:after{
 		content: "Insert an image";
 	}
+	.image-container.empty.viewing-toolbar > .msg-container
+	{
+		display: none;
+	}
 	.image-container > .media-toolbar.empty ~ .msg-container
 	{
 		display: block;
@@ -360,4 +364,8 @@
 		max-height: 500px;
 		padding: 10px;
 		object-fit: contain;
+	}
+	.wysiwyg-section
+	{
+		position: relative;
 	}

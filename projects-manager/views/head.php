@@ -109,7 +109,10 @@ if(empty($section)){
 else
 {
 	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $section));
-	$current_item = $oo->get(end($temp));
+	if(count($temp) !== 3)
+		echo 'object doesnt exist';
+	else
+		$current_item = $oo->get(end($temp));
 }
 $id = empty($current_item) ? false : $current_item['id'];
 $url = empty($current_item) ? false : $current_item['url'];

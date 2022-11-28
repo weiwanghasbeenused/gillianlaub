@@ -13,6 +13,8 @@ $urlIsValid = true;
 $nav_items = array();
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
 
+$isSection = count($uri) == 5;
+
 ?><?
 function insert_object(&$new, $siblings)
 {
@@ -172,14 +174,18 @@ $ws = new WhatYouSee(array());
 		$f_section = array();
 		// objects
 		foreach($vars as $var){
-			if($var == 'name1')
+			if($var == 'name1' && !$isSection)
 				$f[$var] = empty($rr->$var) ? '' : '.' . addslashes($rr->$var);
 			else
 				$f[$var] = empty($rr->$var) ? '' : addslashes($rr->$var);
-			if($var == 'name1' || $var == 'url')
-				$f_section[$var] = 'photograph';
-			else
-				$f_section[$var] = '';
+			if(!$isSection)
+			{
+				if($var == 'name1' || $var == 'url')
+					$f_section[$var] = 'photograph';
+				else
+					$f_section[$var] = '';
+			}
+			
 		}
 		if(!empty($f['name1']) && $f['name1'] != 'undefined')
 		{
@@ -189,13 +195,19 @@ $ws = new WhatYouSee(array());
 			{
 				// wires
 				$ww->create_wire($uu->id, $toid);
-				// default section
-				$toid_section = insert_object($f_section, array());
-				if($toid_section)
-					$ww->create_wire($toid, $toid_section);
-				else echo 'pp';
 				$url = $oo->get($toid)['url'];
-				$redirect_url = "/projects-manager/edit/".$uri[3]."/" . $url;
+				if(!$isSection)
+				{
+					// default section
+					$toid_section = insert_object($f_section, array());
+					if($toid_section)
+						$ww->create_wire($toid, $toid_section);
+					$redirect_url = "/projects-manager/edit/".$uri[3]."/" . $url;
+				}
+				else{
+					$redirect_url = "/projects-manager/edit/".$uri[3]."/" . $uri[4] . '/' . ;
+				}
+				
 				?><script>
 					window.location.href="<?= $redirect_url; ?>";
 				</script><?

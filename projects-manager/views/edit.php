@@ -3,6 +3,9 @@ define('__ROOT__', dirname(dirname(__FILE__)));
 require_once(__ROOT__.'/static/php/editFunctions.php');
 require_once(__ROOT__.'/models/WhatYouSee.php');
 
+if($item['id'] == 0)
+	die();
+
 $project_item = $item;
 $form_url = $admin_path."edit/".$uu->urls();
 if(!empty($section)) $form_url .= '?section=' . $section;
@@ -43,7 +46,7 @@ $fields = array(
 		),
 		'address2' => array(
 			'displayName' => 'Project Thumbnail',
-			'slug' => 'project-thumbnail',
+			'slug' => 'thumbnail',
 			'var' => 'address2',
 			'type' => 'image'
 		),
@@ -53,6 +56,12 @@ $fields = array(
 			'var' => 'external',
 			'type' => 'order'
 		),
+		'rank' => array(
+			'displayName' => 'Rank',
+			'slug' => 'rank',
+			'var' => 'rank',
+			'type' => 'hidden'
+		)
 	),
 	'section' => array(
 		'name1' => array(
@@ -67,12 +76,24 @@ $fields = array(
 			'var' => 'address1',
 			'type' => 'checkbox'
 		),
+		'address2' => array(
+			'displayName' => 'Section Thumbnail',
+			'slug' => 'thumbnail',
+			'var' => 'address2',
+			'type' => 'image'
+		),
 		'body' => array(
 			'displayName' => 'Body',
 			'slug' => 'body',
 			'var' => 'body',
 			'type' => 'wysiwyg'
 		),
+		'rank' => array(
+			'displayName' => 'Rank',
+			'slug' => 'rank',
+			'var' => 'rank',
+			'type' => 'hidden'
+		)
 	),
 );
 $checkbox_options = array(
@@ -207,6 +228,11 @@ if ($rr->action != "update" && $current_item['id'])
 			$fieldType = $field['type'];
 			$displayName = $field['displayName'];
 			$fieldSlug = $field['slug'];
+		if($fieldType == "hidden"){
+			?><input type="hidden" name="<?= $var; ?>" value="<?= $current_item[$var]; ?>" form="edit-form"><?
+		}
+		else
+		{
 		?><div id="field-<?= $var; ?>" class="field">
 			<div class="field-name"><? echo $displayName; ?></div>
 			<div id="field-body-<?= $var; ?>" class="field-body">
@@ -216,39 +242,7 @@ if ($rr->action != "update" && $current_item['id'])
                         echo htmlentities($current_item[$var]);
                 ?></textarea>
                 <? 
-
                 echo $ws->render($var, trimBreaksFromSides($current_item[$var]));
-
-                // if($current_item[$var] && !empty(trimBreaksFromSides($current_item[$var]))){
-                // 	$body = trim($current_item[$var]);
-                // 	$body = str_replace("\r", '', $body);
-                // 	$body = str_replace("\n", '', $body);
-                // 	$body_arr = explode($wysiwyg_section_ending_pattern, $body);
-                // 	$field_html = '';
-                // 	if(!empty($body_arr))
-                // 	{
-                // 		foreach($body_arr as $key => $block_temp)
-                // 		{
-                // 			$block_temp = trim($block_temp);
-                // 			if(!empty($block_temp))
-                // 			{
-                // 				preg_match($wysiwyg_section_opening_pattern, $block_temp, $match);
-                //     			if(!empty($match) && !empty(trim($match[2]))){
-                //     				$thisType = $match[1];
-                //     				$thisContent = trimBreaksFromSides($match[2]);             
-                //     				echo $ws->render($thisType, $var, $thisContent);
-                //     			}
-                // 			}                        			
-                // 		}
-                // 		echo $field_html;
-                // 	}
-                // 	else
-                // 		echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
-                // }
-                // else
-                // 	echo '<div class="wysiwyg-section add-parent">' .$ws->renderAdd($var) . '</div>';
-                        
-				// ** end minimal wysiwig toolbar **
 				}
 				else if($fieldType == "image")
 				{
@@ -300,7 +294,9 @@ if ($rr->action != "update" && $current_item['id'])
 					}
 					?></div><?
 				}
-			?></div>
+			?></div><?
+		}
+		?>
 		</div><?
 		}
 		?>
@@ -389,6 +385,7 @@ else
 		else
 			$current_item[$var] = '';
 	}
+
 	$siblings = $oo->siblings($current_item['id']);
 	$updated = update_object($current_item, $new, $siblings, $vars);
 
