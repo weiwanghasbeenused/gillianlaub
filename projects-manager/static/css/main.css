@@ -490,6 +490,10 @@ main
 {
 	margin-bottom: 20px;
 }
+.callback-msg a
+{
+	text-decoration: underline;
+}
 @media screen and (max-device-width: 568px) {
 	html {
 		font-size: 13px;

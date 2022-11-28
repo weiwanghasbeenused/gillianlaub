@@ -120,7 +120,7 @@ class WhatYouGet extends WhatYouSeeIsWhatYouGet{
 				$caption = $figcaption_match[1];
 		}
 
-		$output = '<figure id="figure-'.$media_id.'" class="gallery-element hashlink-target" ratio="'.$ratio.'"><img class="'.$img_class.'" src="'.$src.'" onload="centerHashlinkTarget(this);" >';
+		$output = '<figure id="figure-'.$media_id.'" class="gallery-element hashlink-target" ratio="'.$ratio.'"><img class="'.$img_class.'" src="'.$src.'" onload="centerHashlinkTarget(this);" alt="'.$caption.'">';
 		if(!empty($caption))
 			$output .= '<figcaption class="caption gallery-caption">' . $caption . '</figcaption>';
 		$output .= '</figure>';

@@ -561,13 +561,10 @@ body[category="commissions"] #projects-grid-container
     {
         display: none;
     }
-    #home-container
-    {
-        padding-top: 76px;
-    }
+    #home-container,
     #project-container
     {
-        padding-top: 96px;
+        padding-top: 76px;
     }
     #cat-toggle-btn-container
     {
@@ -585,15 +582,12 @@ body[category="commissions"] #projects-grid-container
     
 }
 @media screen and (min-width: 1024px) {
-    #home-container
+    #home-container,
+    #project-container
     {
         padding-top: 86px;
     }
-    #project-container
-    {
-        padding-top: 106px;
-    }
-
+    
     #site-name
     {
         width: 360px;
@@ -642,14 +636,12 @@ body[category="commissions"] #projects-grid-container
 }
 
 @media screen and (min-width: 1200px) {
-    #home-container
+    #home-container,
+    #project-container
     {
         padding-top: 90px;
     }
-    #project-container
-    {
-        padding-top:110px;
-    }
+
     #cat-toggle-btn-container,
     #about-btn-container
     {

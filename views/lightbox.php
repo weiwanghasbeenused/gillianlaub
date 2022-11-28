@@ -165,7 +165,25 @@
 			padding-right: 10%;
 			/*max-width: 80%;*/
 		}
+
 	}
+	@media screen and (min-width: 821px) and (orientation: landscape){
+		#lightbox-container[section="exhibition"] #lightbox-current-image .lightbox-image-wrapper,
+		#lightbox-container[section="book"] #lightbox-current-image .lightbox-image-wrapper{
+			position: absolute;
+			width: 100vw;
+			max-width: 100%;
+			height: 100vh;
+			top: 0;
+			left: 0;
+		}
+		#lightbox-container[section="exhibition"] #lightbox-current-image .lightbox-image-wrapper img,
+		#lightbox-container[section="book"] #lightbox-current-image .lightbox-image-wrapper img{
+			object-fit: cover;
+		}
+
+	}
+	#lightbox-container [section="exhibition"]
 	@media screen and (min-width: 1024px){
 		.lightbox-caption
 		{
@@ -180,7 +198,7 @@
 		}
 	}
 </style>
-<div id="lightbox-container">
+<div id="lightbox-container" section="<?= $section; ?>">
 	<h1 class="project-name large in-lightbox"><?= $item['name1'];?></h1>
 	<!-- <div id="lightbox-image-container"> -->
 		<div id="lightbox-prev-image" class="lightbox-image">
@@ -212,9 +230,6 @@
 <script>
 	var slightbox_container = document.getElementById('lightbox-container');
 	var sLightbox_btn = document.getElementsByClassName('lightbox-btn');
-	// var sLightbox_current_box = document.getElementById('lightbox-current-image');
-	// var sLightbox_prev_box = document.getElementById('lightbox-prev-image');
-	// var sLightbox_next_box = document.getElementById('lightbox-next-image');
 	var sLightbox_prev_button = document.getElementById('lightbox-prev-button');
 	var sLightbox_next_button = document.getElementById('lightbox-next-button');
 

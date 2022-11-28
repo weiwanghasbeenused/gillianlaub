@@ -70,7 +70,18 @@ $rr = new Request();
 $js_back = "javascript:history.back();";
 
 // self
-$item = $oo->get($uu->id);
+$uri_copy = $uri;
+if(count($uri) > 3)
+{
+	array_shift($uri_copy);
+	array_shift($uri_copy);
+	array_shift($uri_copy);
+	$temp = $oo->urls_to_ids($uri_copy);
+}
+else
+	$temp = array(0);
+
+$item = $oo->get(end($temp));
 
 // am i using the ternary operator correctly?
 // if this url has an id, get the associated object,
@@ -122,7 +133,9 @@ $general_urls = array(
 	'delete' => '',
 	'edit' => '',
 	'browse' => '',
-	'add' => ''
+	'add' => '',
+	'success' => '',
+	'error' => ''
 );
 if( isset($uri) && count($uri) > 2)
 {
@@ -130,11 +143,14 @@ if( isset($uri) && count($uri) > 2)
 	foreach($general_urls as $key => &$u)
 	{
 		$uri_copy[2] = $key;
-		$u = $delete_url = implode('/', $uri_copy);
+		$u = implode('/', $uri_copy);
+		// if($key == 'success' || $key == 'error')
+		// 	$u = substr($u, 0, strripos($u, '/'));
 		if($key != 'add' && !empty($section)) $u .= '?section=' . $section;
+		$u = $host . substr($u, 1);
 	}
 }
-
+unset($u);
 $general_urls['logout'] = $admin_path . 'logout';
 $general_urls['generate'] = $host . implode("/", $uu->urls);
 

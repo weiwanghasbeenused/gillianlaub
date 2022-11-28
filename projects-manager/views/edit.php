@@ -7,9 +7,8 @@ if($item['id'] == 0)
 	die();
 
 $project_item = $item;
-$form_url = $admin_path."edit/".$uu->urls();
+$form_url = $admin_path."static/php/updateHandler.php";
 if(!empty($section)) $form_url .= '?section=' . $section;
-
 $sections = $oo->children($project_item['id']);
 $nav_items = $sections;
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
@@ -25,10 +24,6 @@ foreach($nav_items as $n)
 	?><a class="<?= $class; ?>" href="<?= $this_url; ?>"><?= $n['name1']; ?></a><?
 }?><a class="nav-item" href="<?= $general_urls['add']; ?>">&plus;</a>
 </section><?
-
-$browse_url = $admin_path.'browse/'.$uu->urls();
-
-$urlIsValid = true;
 
 $fields = array(
 	'main' => array(
@@ -61,6 +56,12 @@ $fields = array(
 			'slug' => 'rank',
 			'var' => 'rank',
 			'type' => 'hidden'
+		),
+		'rank' => array(
+			'displayName' => 'Url',
+			'slug' => 'url',
+			'var' => 'url',
+			'type' => 'text'
 		)
 	),
 	'section' => array(
@@ -93,6 +94,12 @@ $fields = array(
 			'slug' => 'rank',
 			'var' => 'rank',
 			'type' => 'hidden'
+		),
+		'rank' => array(
+			'displayName' => 'Url',
+			'slug' => 'url',
+			'var' => 'url',
+			'type' => 'text'
 		)
 	),
 );
@@ -118,76 +125,10 @@ $current_fields = empty($section) ? $fields['main'] : $fields['section'];
 $wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
 $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 
-function update_object(&$old, &$new, $siblings, $vars)
-{
-	global $oo;
-	global $urlIsValid;
-
-	// set default name if no name given
-	if(!$new['name1'])
-		$new['name1'] = "untitled";
-
-	// add a sort of url break statement for urls that are already in existence
-	// (and potentially violate our new rules?)
-    // urldecode() is for query strings, ' ' -> '+'
-    // rawurldecode() is for urls, ' ' -> '%20'
-	$url_updated = rawurldecode($old['url']) != $new['url'];
-
-	if($url_updated)
-	{
-		// slug-ify url
-		if($new['url'])
-			$new['url'] = slug($new['url']);
-
-		// if the slugified url is empty,
-		// or the original url field is empty,
-		// slugify the name of the object
-		if(empty($new['url']))
-			$new['url'] = slug($new['name1']);
-
-		// make sure url doesn't clash with urls of siblings
-		$s_urls = array();
-		foreach($siblings as $s_id)
-			$s_urls[] = $oo->get($s_id)['url'];
-
-		$urlIsValid = validate_url($new['url'], $s_urls);
-		if( !$urlIsValid )
-			$new['url'] = valid_url($new['url'], strval($old['id']), $s_urls);
-	}
-	// deal with dates
-	if(!empty($new['begin']))
-	{
-		$dt = strtotime($new['begin']);
-		$new['begin'] = date($oo::MYSQL_DATE_FMT, $dt);
-	}
-
-	if(!empty($new['end']))
-	{
-		$dt = strtotime($new['end']);
-		$new['end'] = date($oo::MYSQL_DATE_FMT, $dt);
-	}
-
-	// check for differences
-	$arr = array();
-	foreach($vars as $v)
-		if($old[$v] != $new[$v])
-			$arr[$v] = $new[$v] ?  "'".$new[$v]."'" : "null";
-
-	$updated = false;
-	if(!empty($arr))
-	{
-		$updated = $oo->update($old['id'], $arr);
-	}
-
-	return $updated;
-}
-
 ?><main id="body-container">
 	<?
 	$a_url = $admin_path."browse";
 
-if ($rr->action != "update" && $current_item['id'])
-{
 	// get existing image data
 	$medias = $oo->media($current_item['id']);
 	$num_medias = count($medias);
@@ -300,6 +241,9 @@ if ($rr->action != "update" && $current_item['id'])
 		</div><?
 		}
 		?>
+		<input type='hidden' name='successUrl' value='<?= $general_urls['success']; ?>' form="edit-form" >
+		<input type='hidden' name='errorUrl' value='<?= $general_urls['error']; ?>' form="edit-form" >
+		<input type='hidden' name='objectId' value='<?= $current_item['id']; ?>' form="edit-form" >
 		<div id="btn-openMediaContainer" class="btn on-grey" onclick="openMediaContainer();">Upload media</div>
 		<div id="media-upload-container"><div id="btn-closeMediaContainer" class="icon-cross" onclick="closeMediaContainer();">&times;</div><iframe src="/projects-manager/views/mediaForm.php"></iframe></div>
 		<script>
@@ -340,69 +284,13 @@ if ($rr->action != "update" && $current_item['id'])
 	<form
 		method="post"
 		enctype="multipart/form-data"
-		action="<? echo $form_url; ?>"
+		action="<?= $admin_path; ?>static/php/editHandler.php"
 		id="edit-form"
 	>
 	</form>
 	<script>
 		var wsForm = new WhatYouSee(document.getElementById("edit-form"), document.querySelector('.form'), media_path);
 	</script>
-<?php
-}
-else
-{
-	if(isset($_POST['section-order']) && !empty($_POST['section-order']))
-	{
-		$section_arr = json_decode($_POST['section-order'], true);
-		foreach($section_arr as $s)
-		{
-			$query = 'UPDATE objects SET `rank` = "'.$s['rank'].'" WHERE id="'.$s['id'].'"';
-			$db->query($query);
-		}
-	}
-	$new = array();
-	// objects
-	foreach($vars as $var)
-	{
-		if(is_array($rr->$var))
-		{
-			if(empty($rr->$var))
-				$rr->$var = '';
-			else
-			{
-				if($current_fields[$var]['type'] == 'checkbox')
-					$rr->$var = implode(',', $rr->$var);
-			}
-		}
-		
-		if(!empty($rr->$var))
-			$new[$var] = addslashes($rr->$var);
-		else
-			$new[$var] = $rr->$var;
-		
-		if(isset($current_item[$var]))
-			$current_item[$var] = addslashes($current_item[$var]);
-		else
-			$current_item[$var] = '';
-	}
+</div>
 
-	$siblings = $oo->siblings($current_item['id']);
-	$updated = update_object($current_item, $new, $siblings, $vars);
-
-	?><div class="self-container"><?
-	if($updated)
-	{
-	?><p>Record successfully updated.</p><?
-		if(!$urlIsValid)
-		{
-		?><p>*** The url of this record has been set to '<?= $new['url']; ?>' because of a conflict with another record. ***</p><?
-		}
-	}
-	else
-	{
-	?><p>Nothing was edited, therefore update not required.</p><?
-	}
-	?></div><?
-}
-?></div>
 </main>
