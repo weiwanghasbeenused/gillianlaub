@@ -42,6 +42,7 @@ else
 }
 
 require_once('static/php/function.php');
+require_once('projects-manager/lib/lib.php');
 
 ?><!DOCTYPE html>
 <html lang="en">
