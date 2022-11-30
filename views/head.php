@@ -38,11 +38,17 @@ if(!$uri[1]){
 }
 else
 {
+	$body_class .= ' ' . $uri[1];
 	$category = $uri[1];
 }
 
 require_once('static/php/function.php');
 require_once('projects-manager/lib/lib.php');
+
+$css_arr = array('suisse', 'main');
+
+if($uri[1] == 'about')
+	$css_arr[] = 'about';
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -50,8 +56,11 @@ require_once('projects-manager/lib/lib.php');
 		<title><? echo $site; ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="/static/css/suisse.css">
-		<link rel="stylesheet" href="/static/css/main.css">
+		<meta name="google" content="notranslate">
+		<meta http-equiv="Content-Language" content="en">
+		<? foreach($css_arr as $css){
+			echo '<link rel="stylesheet" href="/static/css/'.$css.'.css">';
+		} ?>
 		<link rel="apple-touch-icon" href="/media/png/touchicon.png" />
 		<script src="/static/js/global.js"></script>
 	</head>
@@ -76,5 +85,12 @@ require_once('projects-manager/lib/lib.php');
 			<a id="cat-commissions" class="cat-name middle" href="/?category=commissions">COMMISSIONS</a>
 			<? } ?>
 		</div>
-		<!-- <div id="main-header-btn-container" class="float-container"></div> -->
+		
 	</header>
+	<? if($uri[1] == 'about') { 
+		if(count($uri) == 2)
+			$url = '/';
+		else
+			$url = '/about';
+	?><a id="btn-close-news-events" class="cross-icon" href="<?= $url; ?>"></a>		
+	<? } ?>

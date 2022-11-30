@@ -371,11 +371,6 @@ body[category="commissions"] #projects-grid-container
 {
     left: 50%;
 }
-.hashlink-target
-{
-/*    padding-top: calc(50vh - 50%);*/
-/*    margin-top: calc(50% - 50vh);*/
-}
 @media screen and (min-width: 321px) {
     .middle
     {
@@ -488,14 +483,7 @@ body[category="commissions"] #projects-grid-container
         padding-left: 25px;
         padding-right:  25px;
     }
-    #site-name
-    {
-        text-align: left;
-    }
     /* grid layout */
-
-    
-    
     #gallery-container.scroll-gallery-container
     {
         padding-left: 10vw;
@@ -562,7 +550,8 @@ body[category="commissions"] #projects-grid-container
         display: none;
     }
     #home-container,
-    #project-container
+    #project-container,
+    .main-container
     {
         padding-top: 76px;
     }
@@ -579,11 +568,16 @@ body[category="commissions"] #projects-grid-container
     {
         display: none;
     }
-    
+    #site-name
+    {
+        text-align: left;
+        margin: 0;
+    }
 }
 @media screen and (min-width: 1024px) {
     #home-container,
-    #project-container
+    #project-container,
+    .main-container
     {
         padding-top: 86px;
     }
@@ -637,7 +631,8 @@ body[category="commissions"] #projects-grid-container
 
 @media screen and (min-width: 1200px) {
     #home-container,
-    #project-container
+    #project-container,
+    .main-container
     {
         padding-top: 90px;
     }
