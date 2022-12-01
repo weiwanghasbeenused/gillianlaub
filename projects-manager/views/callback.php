@@ -6,19 +6,17 @@ require_once(__ROOT__.'/models/WhatYouSee.php');
 if($item['id'] == 0)
 	die();
 
-$project_item = $item;
-$sections = $oo->children($project_item['id']);
+$sections = $oo->children($project_id);
 $nav_items = $sections;
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
-
 ?><section id="nav-container"><?
 foreach($nav_items as $n)
 {
 	$isActive = $section == $n['url'];
 	$class = $isActive ? "nav-item active" : "nav-item inactive";
-	$this_url = $general_urls['edit'];
+	$this_url = '/projects-manager/edit/' . $uri[3] . '/' . $uri[4];
 	if(!empty($n['url']))
-		$this_url .= '?section=' . $n['url'];
+		$this_url .= '/' . $n['url'];
 	?><a class="<?= $class; ?>" href="<?= $this_url; ?>"><?= $n['name1']; ?></a><?
 }?><a class="nav-item" href="<?= $general_urls['add']; ?>">&plus;</a>
 </section><?

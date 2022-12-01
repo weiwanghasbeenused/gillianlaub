@@ -486,6 +486,12 @@ main
 {
 	margin-top: 20px;
 }
+#btn-openMediaContainer
+{
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+}
 .description
 {
 	margin-bottom: 20px;
@@ -493,6 +499,13 @@ main
 .callback-msg a
 {
 	text-decoration: underline;
+}
+.float-container:after
+{
+	content: "";
+	display: block;
+	clear:both;
+	height:0;
 }
 @media screen and (max-device-width: 568px) {
 	html {

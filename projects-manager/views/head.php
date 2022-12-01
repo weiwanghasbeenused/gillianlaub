@@ -2,6 +2,7 @@
 // path to config file
 $config_dir = __DIR__."/../../open-records-generator/config/";
 require_once($config_dir."config.php");
+require_once(__DIR__.'/../config/config.php');
 
 // overwrite o-r-g paths
 $admin_path = $host . "projects-manager/";
@@ -70,18 +71,36 @@ $rr = new Request();
 $js_back = "javascript:history.back();";
 
 // self
-$uri_copy = $uri;
-if(count($uri) > 3)
+$project_uri_index = 4;
+$section_uri_index = $project_uri_index + 1;
+$section = isset($uri[$section_uri_index]) ? $uri[$section_uri_index] : '';
+$current_fields = empty($section) ? $fields['main'] : $fields['section'];
+
+if(count($uri) < 5)
 {
+	$item = $oo->get(0);
+}
+else
+{
+	$uri_copy = $uri;
 	array_shift($uri_copy);
 	array_shift($uri_copy);
 	array_shift($uri_copy);
 	$temp = $oo->urls_to_ids($uri_copy);
+	$item = $oo->get(end($temp));
+	if(count($uri) > $project_uri_index)
+	{
+		if(!empty($section)){
+			array_pop($uri_copy);
+			$temp = $oo->urls_to_ids($uri_copy);
+			$project_id = end($temp);
+		}
+		else{
+			$project_id = $item['id'];
+		}
+	}
 }
-else
-	$temp = array(0);
 
-$item = $oo->get(end($temp));
 
 // am i using the ternary operator correctly?
 // if this url has an id, get the associated object,
@@ -89,7 +108,7 @@ $item = $oo->get(end($temp));
 $name = $item ? strip_tags($item["name1"]) : false;
 
 // document title
-$title = $db_name." | ".$name;
+// $title = $db_name." | ".$name;
 
 // $nav = $oo->nav_clean($uu->ids);
 
@@ -114,21 +133,6 @@ if(file_exists($settings_file))
 if ($view == "logout")
 	header("HTTP/1.1 401 Unauthorized");
 
-$section = isset($_GET['section']) ? $_GET['section'] : '';
-if(empty($section)){
-	$current_item = $item;
-}
-else
-{
-	$temp = $oo->urls_to_ids(array($uri[3], $uri[4], $section));
-	if(count($temp) !== 3)
-		echo 'object doesnt exist';
-	else
-		$current_item = $oo->get(end($temp));
-}
-$id = empty($current_item) ? false : $current_item['id'];
-$url = empty($current_item) ? false : $current_item['url'];
-
 $general_urls = array(
 	'delete' => '',
 	'edit' => '',
@@ -144,9 +148,6 @@ if( isset($uri) && count($uri) > 2)
 	{
 		$uri_copy[2] = $key;
 		$u = implode('/', $uri_copy);
-		// if($key == 'success' || $key == 'error')
-		// 	$u = substr($u, 0, strripos($u, '/'));
-		if($key != 'add' && !empty($section)) $u .= '?section=' . $section;
 		$u = $host . substr($u, 1);
 	}
 }
@@ -154,22 +155,22 @@ unset($u);
 $general_urls['logout'] = $admin_path . 'logout';
 $general_urls['generate'] = $host . implode("/", $uu->urls);
 
-$path = array();
+$path = '';
 if(isset($uri[3]))
 {
-	$path[] = '<a href="/projects-manager/browse/'.$uri[3].'">' . strtoupper($uri[3]) . '</a>';
+	$path .= '<a href="/projects-manager/browse/'.$uri[3].'">' . strtoupper($uri[3]) . '</a>';
 	if(isset($uri[4]))
 	{
-		$path[] = $item['name1'];
-		if(!empty($section))
-			$path[] = $current_item['name1'];		
+		$path .= ': '. $oo->name($project_id);
+		if(isset($uri[5]))
+			$path .= ' > '. $item['name1'];
 	}
 }
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><?php echo $title; ?></title>
+		<title>Projects Manager</title>
 		<meta charset="utf-8">
 		<meta name="description" content="anglophile">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -184,6 +185,6 @@ if(isset($uri[3]))
 			<header class="centre">
 				<div id="nav">
 					<div id="title"><a href="<?php echo $admin_path; ?>browse">Projects Manager</a></div>
-					<div id="path"><?= implode(' > ', $path); ?></div>
+					<div id="path"><?= $path; ?></div>
 				</div>
 			</header>

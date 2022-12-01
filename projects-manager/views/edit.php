@@ -6,122 +6,24 @@ require_once(__ROOT__.'/models/WhatYouSee.php');
 if($item['id'] == 0)
 	die();
 
-$project_item = $item;
-$form_url = $admin_path."static/php/updateHandler.php";
-if(!empty($section)) $form_url .= '?section=' . $section;
-$sections = $oo->children($project_item['id']);
+$sections = $oo->children($project_id);
 $nav_items = $sections;
 array_unshift($nav_items, array('name1' => 'Main', 'url' => ''));
-
 ?><section id="nav-container"><?
 foreach($nav_items as $n)
 {
 	$isActive = $section == $n['url'];
 	$class = $isActive ? "nav-item active" : "nav-item inactive";
-	$this_url = implode('/', $uri);
+	$this_url = '/projects-manager/edit/' . $uri[3] . '/' . $uri[4];
 	if(!empty($n['url']))
-		$this_url .= '?section=' . $n['url'];
+		$this_url .= '/' . $n['url'];
 	?><a class="<?= $class; ?>" href="<?= $this_url; ?>"><?= $n['name1']; ?></a><?
 }?><a class="nav-item" href="<?= $general_urls['add']; ?>">&plus;</a>
 </section><?
 
-$fields = array(
-	'main' => array(
-		'name1' => array(
-			'displayName' => 'Project Name',
-			'slug' => 'project-name',
-			'var' => 'name1',
-			'type' => 'text'
-		),
-		'deck' => array(
-			'displayName' => 'Project Description',
-			'slug' => 'project-description',
-			'var' => 'deck',
-			'type' => 'wysiwyg'
-		),
-		'address2' => array(
-			'displayName' => 'Project Thumbnail',
-			'slug' => 'thumbnail',
-			'var' => 'address2',
-			'type' => 'image'
-		),
-		'external' => array(
-			'displayName' => 'Sections',
-			'slug' => 'sections',
-			'var' => 'external',
-			'type' => 'order'
-		),
-		'rank' => array(
-			'displayName' => 'Rank',
-			'slug' => 'rank',
-			'var' => 'rank',
-			'type' => 'hidden'
-		),
-		'rank' => array(
-			'displayName' => 'Url',
-			'slug' => 'url',
-			'var' => 'url',
-			'type' => 'text'
-		)
-	),
-	'section' => array(
-		'name1' => array(
-			'displayName' => 'Section Name',
-			'slug' => 'section-name',
-			'var' => 'name1',
-			'type' => 'text'
-		),
-		'address1' => array(
-			'displayName' => 'Layout',
-			'slug' => 'layout',
-			'var' => 'address1',
-			'type' => 'checkbox'
-		),
-		'address2' => array(
-			'displayName' => 'Section Thumbnail',
-			'slug' => 'thumbnail',
-			'var' => 'address2',
-			'type' => 'image'
-		),
-		'body' => array(
-			'displayName' => 'Body',
-			'slug' => 'body',
-			'var' => 'body',
-			'type' => 'wysiwyg'
-		),
-		'rank' => array(
-			'displayName' => 'Rank',
-			'slug' => 'rank',
-			'var' => 'rank',
-			'type' => 'hidden'
-		),
-		'rank' => array(
-			'displayName' => 'Url',
-			'slug' => 'url',
-			'var' => 'url',
-			'type' => 'text'
-		)
-	),
-);
-$checkbox_options = array(
-	'layout' => array(
-		'grid' => array(
-			'displayName' => 'Grid',
-			'slug' => 'grid',
-			'checked' => true
-		),
-		'scroll' => array(
-			'displayName' => 'Scroll',
-			'slug' => 'scroll',
-			'checked' => false
-		)
-		
-	),
-);
-$select_options = array();
 
+$select_options = array();
 $class_prefix = 'gillianlaub';
-$current_fields = empty($section) ? $fields['main'] : $fields['section'];
 $wysiwyg_section_opening_pattern = '/^\[wysiwygsection wysiwygtag=\"(.*?)\"\](.*)/';
 $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 
@@ -130,7 +32,7 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 	$a_url = $admin_path."browse";
 
 	// get existing image data
-	$medias = $oo->media($current_item['id']);
+	$medias = $oo->media($item['id']);
 	$num_medias = count($medias);
 
 	for($i = 0; $i < $num_medias; $i++)
@@ -154,10 +56,9 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 ?>
 <script src="<?= $admin_path; ?>static/js/WhatYouSee.js"></script>
 <script>
-	var toid = <?= $current_item['id']; ?>;
+	var toid = <?= $item['id']; ?>;
 	var medias = <?= json_encode($medias, true); ?>;
 	var media_path = '<?= $media_path; ?>';
-	
 </script>
 	<div class="form">
 		<script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
@@ -170,7 +71,7 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 			$displayName = $field['displayName'];
 			$fieldSlug = $field['slug'];
 		if($fieldType == "hidden"){
-			?><input type="hidden" name="<?= $var; ?>" value="<?= $current_item[$var]; ?>" form="edit-form"><?
+			?><input type="hidden" name="<?= $var; ?>" value="<?= $item[$var]; ?>" form="edit-form"><?
 		}
 		else
 		{
@@ -179,25 +80,25 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 			<div id="field-body-<?= $var; ?>" class="field-body">
 			<? if($fieldType == "wysiwyg") { ?>
                 <textarea name='<? echo $var; ?>' class='large dontdisplay wysiwyg-field' id='<? echo $var; ?>-textarea' onblur="" style="display: none;" form="edit-form"><?
-                    if($current_item[$var])
-                        echo htmlentities($current_item[$var]);
+                    if($item[$var])
+                        echo htmlentities($item[$var]);
                 ?></textarea>
                 <? 
-                echo $ws->render($var, trimBreaksFromSides($current_item[$var]));
+                echo $ws->render($var, trimBreaksFromSides($item[$var]));
 				}
 				else if($fieldType == "image")
 				{
 					?><input name="<?= $var; ?>" type="hidden" form="edit-form"><?
 					// echo $ws->render($thisType, $var, $thisContent);
-					// $class = empty($current_item[$var]) ? 'viewing-toolbar' : '';
+					// $class = empty($item[$var]) ? 'viewing-toolbar' : '';
 					$class =  'image-field ' . $fieldSlug;
 					// echo $class;
-					echo $ws->renderImageBlock($var, $current_item[$var], $class, array('fieldname' => $var));
+					echo $ws->renderImageBlock($var, $item[$var], $class, array('fieldname' => $var));
 				}
 				else if($fieldType == "checkbox")
 				{
 					$options = $checkbox_options[$fieldSlug];
-					$value = empty($current_item[$var]) ? '' : trim($current_item[$var]);
+					$value = empty($item[$var]) ? '' : trim($item[$var]);
 					$saved = $value ? explode(',', $value) : array();
 
 					foreach($options as $option)
@@ -215,7 +116,7 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 				}
 				else if($fieldType == "text")
 				{
-				?><input name="<?= $var; ?>" type="text" value="<?= $current_item[$var]; ?>" form="edit-form"><?
+				?><input name="<?= $var; ?>" type="text" value="<?= $item[$var]; ?>" form="edit-form"><?
 				}
 				else if($fieldType == "order" && $fieldSlug == 'sections')
 				{
@@ -223,7 +124,6 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 					$section_num = count($sections);
 					foreach($sections as $key => $s)
 					{
-
 						$select_html = '<select class="order-select" section="'.$s['id'].'" currentValue="'.($key + 1).'" onchange="reorder(this);">';
 						for($i = 0; $i < $section_num; $i++)
 						{
@@ -243,24 +143,12 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 		?>
 		<input type='hidden' name='successUrl' value='<?= $general_urls['success']; ?>' form="edit-form" >
 		<input type='hidden' name='errorUrl' value='<?= $general_urls['error']; ?>' form="edit-form" >
-		<input type='hidden' name='objectId' value='<?= $current_item['id']; ?>' form="edit-form" >
-		<div id="btn-openMediaContainer" class="btn on-grey" onclick="openMediaContainer();">Upload media</div>
+		<input type='hidden' name='objectId' value='<?= $item['id']; ?>' form="edit-form" >
+		<div id="btn-openMediaContainer" class="btn" onclick="openMediaContainer();">Upload media</div>
 		<div id="media-upload-container"><div id="btn-closeMediaContainer" class="icon-cross" onclick="closeMediaContainer();">&times;</div><iframe src="/projects-manager/views/mediaForm.php"></iframe></div>
-		<script>
-			var media_path = '<?= $media_path; ?>';
-			var iframe = document.querySelector('#media-upload-container > iframe').contentWindow;
-			var temp = document.getElementById('btn-openMediaContainer');
-			temp.addEventListener('click', function(){
-				iframe.postMessage(toid, location.origin);
-			});
-			window.addEventListener("message", (event) => {
-				let response = JSON.parse(event.data);
-				medias = response;
-				updateMediaToolbar(medias);
-			}, false);
-		</script>
 		
 		<div class="button-container">
+			
 			<input
 				type='hidden'
 				name='action'
@@ -290,6 +178,17 @@ $wysiwyg_section_ending_pattern = '[/wysiwygsection]';
 	</form>
 	<script>
 		var wsForm = new WhatYouSee(document.getElementById("edit-form"), document.querySelector('.form'), media_path);
+		var media_path = '<?= $media_path; ?>';
+		var iframe = document.querySelector('#media-upload-container > iframe').contentWindow;
+		var temp = document.getElementById('btn-openMediaContainer');
+		temp.addEventListener('click', function(){
+			iframe.postMessage(toid, location.origin);
+		});
+		window.addEventListener("message", (event) => {
+			let response = JSON.parse(event.data);
+			medias = response;
+			updateMediaToolbar(medias);
+		}, false);
 	</script>
 </div>
 

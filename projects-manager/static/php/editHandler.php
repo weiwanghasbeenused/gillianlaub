@@ -1,9 +1,11 @@
 <?
 require_once('../../../open-records-generator/config/config.php');
 require_once('../../../open-records-generator/views/head.php');
+require_once('../../config/config.php');
 $urlIsValid = false;
-$objectId = $_POST['objectId'];
-$current_item = $oo->get($objectId);
+$objectId = isset($_POST['objectId']) ? $_POST['objectId'] : false;
+$current_item = $objectId ? $oo->get($objectId) : array();
+
 function update_object(&$old, &$new, $siblings, $vars)
 {
 	global $oo;
@@ -67,51 +69,54 @@ function update_object(&$old, &$new, $siblings, $vars)
 
 	return $updated;
 }
-
+$reordered = false;
 if(isset($_POST['section-order']) && !empty($_POST['section-order']))
 {
 	$section_arr = json_decode($_POST['section-order'], true);
 	foreach($section_arr as $s)
 	{
 		$query = 'UPDATE objects SET `rank` = "'.$s['rank'].'" WHERE id="'.$s['id'].'"';
-		$db->query($query);
+		$reordered = $db->query($query);
 	}
 }
 $new = array();
 // objects
-foreach($vars as $var)
+if($objectId)
 {
-	if(is_array($rr->$var))
+	foreach($vars as $var)
 	{
-		if(empty($rr->$var))
-			$rr->$var = '';
-		else
+		if(is_array($rr->$var))
 		{
-			if($current_fields[$var]['type'] == 'checkbox')
-				$rr->$var = implode(',', $rr->$var);
+			if(empty($rr->$var))
+				$rr->$var = '';
+			else
+				$rr->$var = implode(',', $rr->$var);	
 		}
-	}
-	
-	if(!empty($rr->$var))
-		$new[$var] = addslashes($rr->$var);
-	else
-		$new[$var] = $rr->$var;
+		
+		if(!empty($rr->$var))
+			$new[$var] = addslashes($rr->$var);
+		else
+			$new[$var] = $rr->$var;
 
-	if(isset($current_item[$var]))
-		$current_item[$var] = addslashes($current_item[$var]);
-	else
-		$current_item[$var] = '';
+		if(isset($current_item[$var]))
+			$current_item[$var] = addslashes($current_item[$var]);
+		else
+			$current_item[$var] = '';
+	}
+	$siblings = $oo->siblings($objectId);
+	$updated = update_object($current_item, $new, $siblings, $vars);
 }
-$siblings = $oo->siblings($objectId);
-$updated = update_object($current_item, $new, $siblings, $vars);
-if($updated)
+else
+$updated = false;
+
+if($updated || $reordered)
 {
-	header("Location: " . substr($_POST['successUrl'], 0, strripos($_POST['successUrl'], '/')) . '/' . $new['url'] . '?action=edit');
+	header("Location: " . $_POST['successUrl'] . '?action=edit');
 	exit();
 }
 else
 {
-	header("Location: " . substr($_POST['errorUrl'], 0, strripos($_POST['errorUrl'], '/')) . '/' . $new['url'] . '?action=edit');
+	header("Location: " . $_POST['errorUrl'] . '?action=edit');
 	exit();
 }
 

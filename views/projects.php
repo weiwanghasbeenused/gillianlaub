@@ -335,6 +335,10 @@ if($item['notes']){
     display: inline-block;
     margin-right: 10px;
 }
+.icon-btn:last-child
+{
+	margin-right: 0;
+}
 .icon-btn.grid,
 .icon-btn.scroll
 {

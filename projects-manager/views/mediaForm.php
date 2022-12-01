@@ -1,10 +1,30 @@
+<?
+$config_dir = __DIR__."/../../open-records-generator/config/";
+require_once($config_dir."config.php");
+$admin_path = $host . "projects-manager/";
+$user = isset($_SERVER['PHP_AUTH_USER']) ? $_SERVER['PHP_AUTH_USER'] : $_SERVER['REDIRECT_REMOTE_USER'];
+$db = db_connect($user);
+$oo = new Objects();
+$mm = new Media();
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Projects Manager</title>
+		<meta charset="utf-8">
+		<meta name="description" content="anglophile">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="shortcut icon" href="<? echo $admin_path;?>media/icon.png">
+		<link rel="apple-touch-icon-precomposed" href="<? echo $admin_path;?>media/icon.png">
+		<link rel="stylesheet" href="<? echo $admin_path; ?>static/css/main.css">
+		<link rel="stylesheet" href="<? echo $admin_path; ?>static/css/form.css">
+	</head>
+	<body>
 <? 
 if(empty($_POST) || $_POST['action'] != 'upload') // display form
 {
-	require_once('head.php');
 ?>
 <script src="<?= $admin_path . 'static/js/edit.js'; ?>"></script>
-
 <form id="media-form" method="post" enctype='multipart/form-data'>
 	<input form="media-form" name="action" value="upload" type="hidden">
 	<input form="media-form" name="toid" value="" type="hidden">
@@ -113,7 +133,6 @@ if(empty($_POST) || $_POST['action'] != 'upload') // display form
 }
 else // respond with uploaded media srcs
 {
-	require_once('head.php');
 	$message = [];
 	$toid = $_POST['toid'];
 	foreach($_FILES["uploads"]["error"] as $key => $error)

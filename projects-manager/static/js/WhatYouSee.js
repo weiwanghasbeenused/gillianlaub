@@ -1,5 +1,5 @@
 class WhatYouSee{
-	constructor(form, container=false, mediaPath)
+	constructor(form, container=false, mediaPath = '')
 	{
 		this.mediaPath = mediaPath;
 		this.form = form;
@@ -78,7 +78,26 @@ class WhatYouSee{
 				this.container.querySelector('input[name='+name+']').value = src;
 			}.bind(this));
 		}
-		let sCheckbox_field = this.container.querySelectorAll('.checkbox-field');
+		let sCheckbox_field = this.container.querySelectorAll('input[type="checkbox"]');
+		if(sCheckbox_field.length != 0)
+		{
+			var this_name = '';
+			var this_value = [];
+			[].forEach.call(sCheckbox_field, function(el){
+				if(el.getAttribute('fieldname') != this_name){
+					if(this_name !== '')
+					{
+						let input = this.container.querySelector('input[name="'+this_name+'"]');
+						if(input){
+							input.value = this_value.join(',');
+						}
+					}
+					this_name = el.getAttribute('fieldname');
+					this_value = [];
+				}
+				this_value.push(el.value);
+			});
+		}
 		let sOrder_select = this.container.querySelectorAll('.order-select');
 		if(sOrder_select.length != 0)
 		{
