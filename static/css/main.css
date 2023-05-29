@@ -182,14 +182,11 @@ body[category="commissions"] #cat-toggle-btn:after
 {
     flex-basis: calc( (100% - 20px) / 2 );
 }
-.two-to-three-cols-grid-container .grid-item:nth-child(2n)
+.two-to-three-cols-grid-container .grid-item
 {
-    margin-left: 10px;
+    margin-right: 20px;
 }
-.two-to-three-cols-grid-container .grid-item:nth-child(2n-1)
-{
-    margin-right: 10px;
-}
+
 #gallery-container .grid-item
 {
      margin-bottom: 20px;
@@ -391,22 +388,31 @@ body[category="commissions"] #projects-grid-container
     {
         padding-top: 140px;
     }
+    #sections-grid-container
+    {
+        display: flex;
+        flex-wrap: wrap;
+    }
     #sections-grid-container .grid-item
     {
-        display: inline-block;
+/*        display: inline-block;*/
         margin-right: 20px;
-        vertical-align: top;
+        flex-basis: calc( (100% - 20px) / 2 );
+/*        vertical-align: top;*/
     }
-    #sections-grid-container .grid-item.two-cols-grid-item
+    /*#sections-grid-container .grid-item.two-cols-grid-item
     {
         width: calc( (100% - 20px) / 2 );        
-    }
-    #sections-grid-container .grid-item.last-col-grid-item
+    }*/
+    #sections-grid-container .grid-item.last-col-grid-item,
+    #sections-grid-container .two-cols-grid-item:nth-child(2n),
+    #sections-grid-container .three-cols-grid-item:nth-child(3n)
     {
         margin-right: 0;
     }
 
 }
+
 @media screen and (min-width: 376px) {
     #main-header,
     #main-footer
@@ -429,23 +435,35 @@ body[category="commissions"] #projects-grid-container
     }
     
 }
+@media screen and (max-width: 700px) {
+    .two-to-three-cols-grid-container .grid-item:nth-child(2n)
+    {
+        margin-right: 0;
+    }
+}
 @media screen and (min-width: 700px) {
+    .grid-container
+    {
+        display: flex;
+        flex-wrap: wrap;
+    }
     .grid-item{
-        display: inline-block;
         margin-right: 25px;
-        vertical-align: top;
         margin-bottom: 35px;
     }
     .grid-item.two-cols-grid-item
     {
-        width: calc( (100% - 25px) / 2 );
+        flex-basis: calc( (100% - 25px) / 2 );
         
     }
     .grid-item.three-cols-grid-item
     {
-        width: calc( (100% - 50px) / 3 );
+        flex-basis: calc( (100% - 50px) / 3 );
     }
-    .grid-item.last-col-grid-item
+    .grid-item.last-col-grid-item,
+    .two-cols-grid-item:nth-child(2n),
+    .three-cols-grid-item:nth-child(3n),
+    .two-to-three-cols-grid-container .grid-item:nth-child(3n)
     {
         margin-right: 0;
     }
@@ -453,21 +471,11 @@ body[category="commissions"] #projects-grid-container
     {
         flex-basis: calc( (100% - 50px) / 3 );
     }
-    .two-to-three-cols-grid-container .grid-item:nth-child(3n-2)
+    .two-to-three-cols-grid-container .grid-item
     {
-        margin-left: 0;
-        margin-right: 16.67px;
+        margin-right: 25px;
     }
-    .two-to-three-cols-grid-container .grid-item:nth-child(3n-1)
-    {
-        margin-right: 8.33px;
-        margin-left: 8.33px;
-    }
-    .two-to-three-cols-grid-container .grid-item:nth-child(3n)
-    {
-        margin-left: 16.67px;
-        margin-right: 0;
-    }
+    
     #gallery-container .grid-item
     {
          margin-bottom: 25px;

@@ -183,7 +183,7 @@
 		}
 
 	}
-	#lightbox-container [section="exhibition"]
+/*	#lightbox-container [section="exhibition"]*/
 	@media screen and (min-width: 1024px){
 		.lightbox-caption
 		{

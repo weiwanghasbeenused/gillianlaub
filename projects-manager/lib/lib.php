@@ -7,4 +7,4 @@ function trimBreaksFromSides($string){
     }
     else $output = '';
     return $output;
-} 
+}
